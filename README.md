@@ -7,7 +7,7 @@ Porfio adalah aplikasi berbasis AI dan cloud yang memungkinkan pengguna mengungg
 
 ## **👥 Kelompok 17 Senior Project**
 1. Ketua Kelompok : 
-2. Anggota 1    : 
+2. Anggota 1    : Raditya Ryan Narotama - 23/518350/TK/57045
 3. Anggota 2    : Nevrita Natasya Putriana - 23/514635/TK/56500
 
 ## **💡 Fitur Aplikasi**
