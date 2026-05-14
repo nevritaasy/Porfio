@@ -72,7 +72,7 @@ export default function Analysis() {
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {isAnalyzing ? (
-          /* --- LOADING STATE --- */
+          /* LOADING STATE */
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -81,7 +81,7 @@ export default function Analysis() {
             <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
               <Loader2 className="w-12 h-12 text-primary animate-spin" />
             </div>
-            <h2 className="text-3xl font-bold mb-4">Menganalisis CV Anda...</h2>
+            <h2 className="text-3xl font-bold mb-4">Menganalisis CV...</h2>
             <p className="text-xl text-muted-foreground mb-8">
               AI kami sedang membedah keahlian Anda untuk mencari peluang karir terbaik.
             </p>
@@ -106,12 +106,12 @@ export default function Analysis() {
             </div>
           </motion.div>
         ) : (
-          /* --- RESULTS STATE --- */
+          /* RESULTS STATE */
           <div className="space-y-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <h1 className="text-4xl font-bold mb-3">Hasil Analisis CV</h1>
               <p className="text-xl text-muted-foreground">
-                Berdasarkan data yang diupload, berikut adalah profil profesional Anda.
+                Berikut adalah analisis lengkap dari CV Anda.
               </p>
             </motion.div>
 
@@ -133,7 +133,7 @@ export default function Analysis() {
                     <span className="text-3xl opacity-70">/100</span>
                   </div>
                   <p className="mt-4 text-secondary-foreground/80 max-w-md">
-                    Luar biasa! Profil CV Anda menunjukkan spesialisasi yang sangat kuat di bidang teknologi modern.
+                    Profil CV Anda menunjukkan potensi yang kuat untuk berbagai peluang karir
                   </p>
                 </div>
                 <div className="hidden md:block">
@@ -197,7 +197,7 @@ export default function Analysis() {
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="w-6 h-6 text-secondary" />
-                  <h2 className="text-2xl font-bold">Rekomendasi Karir</h2>
+                  <h2 className="text-2xl font-bold">Rekomendasi Pekerjaan</h2>
                 </div>
                 {analysis.recommendations.map((job: any, index: number) => (
                   <motion.div
@@ -207,28 +207,20 @@ export default function Analysis() {
                     transition={{ delay: 0.4 + index * 0.1 }}
                     className="bg-card rounded-2xl p-6 border border-border shadow-sm hover:border-primary/50 transition-colors"
                   >
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-xl font-bold text-foreground">{job.role}</h3>
-                          <span className="bg-secondary/10 text-secondary text-xs font-bold px-2 py-1 rounded-md border border-secondary/20">
+                          <h3 className="text-xl font-bold text-foreground leading-none">{job.role}</h3>
+                          <span className=" inline-flex bg-secondary/10 text-secondary text-xs font-bold px-2 py-1 rounded-md border border-secondary/20">
                             {job.matchScore}% MATCH
                           </span>
                         </div>
-                        <p className="text-muted-foreground mb-3">{job.company}</p>
-                        <div className="flex flex-wrap gap-4 text-sm font-medium text-foreground/70">
-                          <div className="flex items-center gap-1.5">
-                            <MapPin className="size-4 text-primary" /> {job.location}
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <DollarSign className="size-4 text-primary" /> {job.salary}
-                          </div>
-                        </div>
                       </div>
-                      <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center">
+                      <div className="w-14 h-14 bg-muted rounded-xl flex items-center justify-center shrink-0">
                         <Briefcase className="size-7 text-secondary" />
                       </div>
                     </div>
+
                     <div className="bg-muted/50 rounded-xl p-4 mb-4">
                       <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Analisis AI:</p>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -240,9 +232,6 @@ export default function Analysis() {
                         ))}
                       </ul>
                     </div>
-                    <button className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-bold hover:opacity-90 shadow-sm transition-opacity">
-                      Lamar Sekarang
-                    </button>
                   </motion.div>
                 ))}
               </div>
