@@ -1,0 +1,162 @@
+[
+  {
+    "role": "Frontend Developer",
+    "category": "Software Engineering",
+    "description": "Membangun antarmuka pengguna berbasis web menggunakan teknologi frontend modern.",
+    "required_skills": ["HTML", "CSS", "JavaScript", "React", "Git"],
+    "optional_skills": ["TypeScript", "Next.js", "Vue.js", "Angular", "Figma", "REST API", "GraphQL", "Tailwind CSS", "Testing"],
+    "related_roles": ["Full Stack Developer", "UI/UX Designer", "Mobile Developer"]
+  },
+  {
+    "role": "Backend Developer",
+    "category": "Software Engineering",
+    "description": "Membangun logika server, API, dan sistem database untuk mendukung aplikasi.",
+    "required_skills": ["Python", "Node.js", "SQL", "REST API", "Git"],
+    "optional_skills": ["Java", "Go", "PHP", "PostgreSQL", "MongoDB", "Redis", "Docker", "Microservices", "FastAPI", "Spring Boot"],
+    "related_roles": ["Full Stack Developer", "DevOps Engineer", "Data Engineer"]
+  },
+  {
+    "role": "Full Stack Developer",
+    "category": "Software Engineering",
+    "description": "Mengembangkan frontend dan backend aplikasi secara menyeluruh.",
+    "required_skills": ["HTML", "CSS", "JavaScript", "SQL", "Git", "REST API"],
+    "optional_skills": ["React", "Node.js", "Python", "TypeScript", "Docker", "PostgreSQL", "MongoDB", "Next.js"],
+    "related_roles": ["Frontend Developer", "Backend Developer", "Software Engineer"]
+  },
+  {
+    "role": "Software Engineer",
+    "category": "Software Engineering",
+    "description": "Merancang, mengembangkan, dan memelihara perangkat lunak berkualitas tinggi.",
+    "required_skills": ["Algorithm Design", "Data Structures", "Object-Oriented Programming", "Git"],
+    "optional_skills": ["Python", "Java", "C++", "System Design", "Microservices", "Testing", "Agile", "Scrum"],
+    "related_roles": ["Backend Developer", "Full Stack Developer", "DevOps Engineer"]
+  },
+  {
+    "role": "Mobile Developer",
+    "category": "Software Engineering",
+    "description": "Mengembangkan aplikasi mobile untuk platform Android dan/atau iOS.",
+    "required_skills": ["Flutter", "Dart", "Git"],
+    "optional_skills": ["React Native", "Android Development", "iOS Development", "Kotlin", "Swift", "Firebase", "REST API"],
+    "related_roles": ["Frontend Developer", "Full Stack Developer", "UI/UX Designer"]
+  },
+  {
+    "role": "Data Analyst",
+    "category": "Data & Analytics",
+    "description": "Menganalisis data untuk menghasilkan insight bisnis yang actionable.",
+    "required_skills": ["SQL", "Data Analysis", "Data Visualization", "Microsoft Excel"],
+    "optional_skills": ["Python", "R", "Tableau", "Power BI", "Statistical Analysis", "Pandas", "NumPy", "Google Data Studio", "A/B Testing"],
+    "related_roles": ["Data Scientist", "Business Analyst", "Data Engineer"]
+  },
+  {
+    "role": "Data Scientist",
+    "category": "Data & Analytics",
+    "description": "Membangun model prediktif dan machine learning untuk memecahkan masalah bisnis kompleks.",
+    "required_skills": ["Python", "Machine Learning", "Data Analysis", "SQL", "Statistical Analysis"],
+    "optional_skills": ["R", "Deep Learning", "TensorFlow", "PyTorch", "Scikit-learn", "Feature Engineering", "Data Visualization", "Pandas", "NumPy"],
+    "related_roles": ["AI Engineer", "Data Analyst", "Data Engineer"]
+  },
+  {
+    "role": "AI Engineer",
+    "category": "Artificial Intelligence",
+    "description": "Membangun dan men-deploy sistem kecerdasan buatan dan model machine learning ke production.",
+    "required_skills": ["Python", "Machine Learning", "Deep Learning", "SQL"],
+    "optional_skills": ["TensorFlow", "PyTorch", "Natural Language Processing", "Computer Vision", "MLOps", "Docker", "Kubernetes", "Hugging Face", "LangChain", "OpenAI API"],
+    "related_roles": ["Data Scientist", "Backend Developer", "Data Engineer"]
+  },
+  {
+    "role": "Data Engineer",
+    "category": "Data & Analytics",
+    "description": "Membangun dan memelihara pipeline data, data warehouse, dan infrastruktur data.",
+    "required_skills": ["SQL", "Python", "Data Engineering", "Cloud Computing"],
+    "optional_skills": ["Apache Kafka", "Spark", "Airflow", "AWS", "Google Cloud Platform", "Docker", "PostgreSQL", "MongoDB", "Elasticsearch", "dbt"],
+    "related_roles": ["Data Scientist", "Backend Developer", "DevOps Engineer"]
+  },
+  {
+    "role": "UI/UX Designer",
+    "category": "Design",
+    "description": "Merancang pengalaman pengguna yang intuitif dan antarmuka yang estetis.",
+    "required_skills": ["Figma", "Prototyping", "User Research"],
+    "optional_skills": ["Adobe XD", "Sketch", "Wireframing", "Usability Testing", "HTML", "CSS", "Design Thinking", "Adobe Photoshop", "Adobe Illustrator", "Zeplin"],
+    "related_roles": ["Product Designer", "Frontend Developer", "Product Manager"]
+  },
+  {
+    "role": "Graphic Designer",
+    "category": "Design",
+    "description": "Menciptakan konten visual untuk brand, marketing, dan komunikasi.",
+    "required_skills": ["Adobe Photoshop", "Adobe Illustrator", "Canva"],
+    "optional_skills": ["Adobe After Effects", "Adobe Premiere Pro", "Figma", "Typography", "Branding", "Social Media Design", "Blender"],
+    "related_roles": ["UI/UX Designer", "Content Creator", "Digital Marketing Specialist"]
+  },
+  {
+    "role": "DevOps Engineer",
+    "category": "Infrastructure & Operations",
+    "description": "Mengelola infrastruktur, pipeline CI/CD, dan otomasi deployment.",
+    "required_skills": ["Linux", "Docker", "CI/CD", "Git", "Cloud Computing"],
+    "optional_skills": ["Kubernetes", "Terraform", "Ansible", "AWS", "Google Cloud Platform", "Microsoft Azure", "Jenkins", "GitHub Actions", "Monitoring", "Prometheus", "Grafana"],
+    "related_roles": ["Backend Developer", "Cloud Engineer", "Site Reliability Engineer"]
+  },
+  {
+    "role": "Network Engineer",
+    "category": "Infrastructure & Operations",
+    "description": "Merancang, mengimplementasikan, dan memelihara infrastruktur jaringan.",
+    "required_skills": ["Networking", "Computer Networks", "Linux"],
+    "optional_skills": ["Cisco", "Firewall", "VPN", "Cloud Computing", "Cybersecurity", "Wireshark", "Network Monitoring"],
+    "related_roles": ["Cybersecurity Specialist", "DevOps Engineer", "Systems Administrator"]
+  },
+  {
+    "role": "Cybersecurity Specialist",
+    "category": "Infrastructure & Operations",
+    "description": "Melindungi sistem dan data dari ancaman siber melalui audit, penetration testing, dan kebijakan keamanan.",
+    "required_skills": ["Cybersecurity", "Networking", "Linux"],
+    "optional_skills": ["Penetration Testing", "Ethical Hacking", "Wireshark", "Burp Suite", "Metasploit", "Nessus", "SIEM", "Incident Response", "Risk Assessment"],
+    "related_roles": ["Network Engineer", "DevOps Engineer", "IT Auditor"]
+  },
+  {
+    "role": "Product Manager",
+    "category": "Product & Business",
+    "description": "Memimpin pengembangan produk dari ideasi hingga launch dengan memahami kebutuhan pasar dan pengguna.",
+    "required_skills": ["Project Management", "Communication", "Analytical Thinking", "Agile"],
+    "optional_skills": ["Scrum", "Data Analysis", "SQL", "User Research", "Roadmapping", "Jira", "Presentation", "Negotiation", "Stakeholder Management"],
+    "related_roles": ["Business Analyst", "UI/UX Designer", "Scrum Master"]
+  },
+  {
+    "role": "Business Analyst",
+    "category": "Product & Business",
+    "description": "Menganalisis kebutuhan bisnis dan menerjemahkannya menjadi spesifikasi teknis dan solusi.",
+    "required_skills": ["Analytical Thinking", "Communication", "Data Analysis", "Microsoft Excel"],
+    "optional_skills": ["SQL", "Power BI", "Tableau", "Jira", "Confluence", "Process Mapping", "BPMN", "Stakeholder Management", "Agile"],
+    "related_roles": ["Product Manager", "Data Analyst", "Project Manager"]
+  },
+  {
+    "role": "Digital Marketing Specialist",
+    "category": "Marketing & Communication",
+    "description": "Merancang dan mengeksekusi strategi pemasaran digital untuk meningkatkan brand awareness dan konversi.",
+    "required_skills": ["Google Analytics", "SEO", "Social Media", "Content Creation"],
+    "optional_skills": ["Google Ads", "Facebook Ads Manager", "Email Marketing", "SEMrush", "Ahrefs", "Copywriting", "Mailchimp", "Hootsuite", "A/B Testing", "Data Analysis"],
+    "related_roles": ["Content Writer", "Social Media Manager", "Growth Hacker"]
+  },
+  {
+    "role": "Content Writer",
+    "category": "Marketing & Communication",
+    "description": "Menulis konten yang menarik dan informatif untuk berbagai platform digital dan cetak.",
+    "required_skills": ["Writing", "Research", "Communication"],
+    "optional_skills": ["SEO", "Copywriting", "Social Media", "Editing", "Storytelling", "WordPress", "Content Strategy", "Canva"],
+    "related_roles": ["Digital Marketing Specialist", "Social Media Manager", "Journalist"]
+  },
+  {
+    "role": "Human Resource Specialist",
+    "category": "Human Resources",
+    "description": "Mengelola proses rekrutmen, pengembangan karyawan, dan kebijakan SDM organisasi.",
+    "required_skills": ["Communication", "Interpersonal Skills", "Organization", "Microsoft Office"],
+    "optional_skills": ["Recruitment", "Performance Management", "Training & Development", "Labor Law", "HRIS", "Payroll", "Conflict Resolution", "Emotional Intelligence"],
+    "related_roles": ["Talent Acquisition Specialist", "Learning & Development Specialist", "HR Manager"]
+  },
+  {
+    "role": "Financial Analyst",
+    "category": "Finance & Accounting",
+    "description": "Menganalisis data keuangan, menyusun laporan, dan memberikan rekomendasi investasi atau anggaran.",
+    "required_skills": ["Microsoft Excel", "Financial Analysis", "Analytical Thinking", "Data Analysis"],
+    "optional_skills": ["SQL", "Power BI", "Python", "Accounting", "Budgeting", "Forecasting", "SAP", "Bloomberg", "Risk Assessment", "Presentation"],
+    "related_roles": ["Business Analyst", "Accountant", "Investment Analyst"]
+  }
+]
