@@ -151,7 +151,7 @@ def extract_text_from_pdf(
         if fitz_doc is not None:
             fitz_doc.close()
 
-    full_text = "\f".join(p["text"] for p in pages_data)
+    full_text = "\n\n".join(p["text"] for p in pages_data)
     metadata = validate_extraction(pages_data)
 
     return {

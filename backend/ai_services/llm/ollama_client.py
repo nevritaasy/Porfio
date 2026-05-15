@@ -1,19 +1,10 @@
-"""
-Ollama LLM 
-If Ollama is unavailable then the result will use rule based
-
-Configuration via environment variables:
-  OLLAMA_HOST   – Ollama API base URL (default: http://localhost:11434)
-  OLLAMA_MODEL  – Model to use        (default: llama3.2:3b)
-
-Docker / remote usage:
-  Set OLLAMA_HOST=http://host.docker.internal:11434 when running inside a container.
-"""
+# Ollama LLM pakai model qwen2.5:1.5b, kalau unavailable akan fallback ke rule based
 
 from __future__ import annotations
 
 import json
 import os
+import re
 from typing import Optional
 
 try:
@@ -23,9 +14,9 @@ except ImportError:
     _REQUESTS_AVAILABLE = False
 
 _DEFAULT_HOST = "http://localhost:11434"
-_DEFAULT_MODEL = "llama3.2:3b"
+_DEFAULT_MODEL = "qwen2.5:1.5b"
 _GENERATE_ENDPOINT = "/api/generate"
-_TIMEOUT_SECONDS = 60
+_TIMEOUT_SECONDS = 300
 
 
 class OllamaClient:
@@ -81,23 +72,73 @@ class OllamaClient:
             print(f"[ollama_client] generate() failed: {exc}")
             return None
 
-    # Helper 
+    @staticmethod
+    def _clean_summary(text: str) -> str:
+        # Remove markdown bold
+        text = re.sub(r"\*{1,2}([^*]+)\*{1,2}", r"\1", text)
+        # Remove header markers
+        text = re.sub(r"^#{1,3}\s*", "", text, flags=re.MULTILINE)
+        return text.strip()
+
+    @staticmethod
+    def _clean_list_output(raw: str) -> list[str]:
+        # Intro/outro patterns to drop
+        _FILLER_PATTERNS = re.compile(
+            r"^(berikut|tentu|tentunya|baik|oke|okay|ini|mari|sebagai|selain|untuk|catatan|kesimpulan|perlu diingat)",
+            re.IGNORECASE,
+        )
+        _OUTRO_PATTERNS = re.compile(
+            r"(semoga|sekian|demikian|harapan|jadilah|terus|tetaplah)",
+            re.IGNORECASE,
+        )
+
+        items: list[str] = []
+        for line in raw.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            # Remove markdown heading markers
+            line = re.sub(r"^#{1,3}\s*", "", line)
+            # Remove markdown bold
+            line = re.sub(r"\*{1,2}([^*]+)\*{1,2}", r"\1", line)
+            # Strip trailing colon-headers 
+            if line.endswith(":") and len(line.split()) <= 4:
+                continue
+            # Strip bullet/numbered prefix
+            line = re.sub(r"^[-•*\d]+[.)\-]?\s*", "", line).strip()
+            if not line:
+                continue
+            # Drop filler intro sentences
+            if _FILLER_PATTERNS.match(line):
+                continue
+            # Drop outro sentences
+            if _OUTRO_PATTERNS.search(line):
+                continue
+            items.append(line)
+        return items
+
     def generate_profile_summary(self, prompt: str) -> Optional[str]:
-        return self.generate(prompt)
+        raw = self.generate(prompt)
+        if raw is None:
+            return None
+        return self._clean_summary(raw) or None
 
     def generate_strengths(self, prompt: str) -> Optional[list[str]]:
         raw = self.generate(prompt)
         if raw is None:
             return None
-        lines = [
-            line.lstrip("-•*123456789. ").strip()
-            for line in raw.splitlines()
-            if line.strip() and not line.strip().startswith("#")
-        ]
-        return [ln for ln in lines if ln] or None
+        items = self._clean_list_output(raw)
+        return items if items else None
 
     def generate_improvements(self, prompt: str) -> Optional[list[str]]:
-        return self.generate_strengths(prompt)  
+        raw = self.generate(prompt)
+        if raw is None:
+            return None
+        items = self._clean_list_output(raw)
+        return items if items else None
 
     def generate_role_reason(self, prompt: str) -> Optional[str]:
-        return self.generate(prompt)
+        raw = self.generate(prompt)
+        if raw is None:
+            return None
+        return self._clean_summary(raw) or None
