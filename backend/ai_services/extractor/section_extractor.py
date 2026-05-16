@@ -32,7 +32,7 @@ _SECTION_KEYWORD_MAP: list[tuple[str, list[str]]] = [
     ]),
     ("certifications", [
         "certifications", "certification", "licenses", "awards", "achievements",
-        "courses", "training", "certificate",
+        "course", "courses", "training", "trainings", "certificate", "certificates",
         "sertifikasi", "sertifikat", "penghargaan", "pelatihan", "kursus",
     ]),
     ("interest", [
@@ -73,11 +73,13 @@ _SUBSECTION_SIGNALS: list[tuple[re.Pattern, str]] = [
 ]
 
 RE_PROJECT_ENTRY = re.compile(r".+\(\d{4}\)\s*:", re.I)
+RE_COURSE_ENTRY = re.compile(r"^(course|courses?|training|pelatihan|kursus)\s*\(\d{4}\)\s*:", re.I)
 
 
 def normalize_text(text: str) -> list[str]:
     for char in _INVISIBLE_CHARS:
         text = text.replace(char, "")
+    text = text.replace("\f", "\n").replace("\r", "\n")
     lines = text.split("\n")
     return [line.strip() for line in lines if line.strip()]
 
@@ -149,7 +151,7 @@ def split_mixed_section(lines: list[str]) -> dict[str, list[str]]:
         sub = _content_type_of_line(line)
         if sub:
             state = sub
-        if RE_PROJECT_ENTRY.match(line):
+        if RE_PROJECT_ENTRY.match(line) and not RE_COURSE_ENTRY.match(line):
             state = "projects"
         buckets[state].append(line)
 
@@ -164,7 +166,9 @@ def split_sections(text: str) -> dict[str, list[str]]:
 
     stop_keywords = {
         "projects", "skills", "hard skills", "soft skills", "interest",
-        "languages", "tools", "portfolio"
+        "languages", "tools", "portfolio", "course", "courses",
+        "certification", "certifications", "certificate", "certificates",
+        "training", "trainings",
     }
 
     for line in lines:
@@ -182,6 +186,8 @@ def split_sections(text: str) -> dict[str, list[str]]:
                 current_section = "projects"
             elif "skill" in clean_line_lower or "tool" in clean_line_lower or "language" in clean_line_lower:
                 current_section = "skills"
+            elif any(kw in clean_line_lower for kw in ["course", "certification", "certificate", "training"]):
+                current_section = "certifications"
             elif "interest" in clean_line_lower:
                 current_section = "interest"
             

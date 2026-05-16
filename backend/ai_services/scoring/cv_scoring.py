@@ -171,6 +171,8 @@ def _score_completeness(cv_data: dict) -> float:
         pts += COMPLETENESS_POINTS["experience"]
     if cv_data.get("projects"):
         pts += COMPLETENESS_POINTS["projects"]
+    if cv_data.get("certifications"):
+        pts += COMPLETENESS_POINTS["certifications"]
 
     return _clamp(pts)
 
@@ -242,7 +244,7 @@ def _generate_explanation(scores: dict) -> str:
     return " ".join(parts)
 
 # Main entry point
-def score_cv(cv_data: dict) -> dict:
+def score_cv(cv_data: dict, recommendations: list = None) -> dict:
     skill_score = _score_skills(cv_data)
     experience_score = _score_experience(cv_data)
     education_score = _score_education(cv_data)
@@ -260,6 +262,18 @@ def score_cv(cv_data: dict) -> dict:
  
     if parsing_quality_score < 100:
         overall = overall * (0.5 + 0.5 * (parsing_quality_score / 100.0))
+
+    # Apply realistic deductions for typical missing parts
+    contact = cv_data.get("contact", {}) or {}
+    if not contact.get("portfolio"):
+        overall -= 4.0
+    if not cv_data.get("certifications"):
+        overall -= 3.0
+    
+    # Deduct for missing skills from top recommendation
+    if recommendations:
+        missing = recommendations[0].get("missing_skills", [])
+        overall -= min(len(missing) * 2.0, 8.0)
 
     scores = {
         "overall_score": round(_clamp(overall), 1),

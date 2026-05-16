@@ -1,0 +1,285 @@
+{
+  "cv_data": {
+    "contact": {
+      "name": "DEONA GRACIA PUTRI",
+      "email": "deonagraciaputri@mail.ugm.ac.id",
+      "phone": "089620626958",
+      "linkedin": null,
+      "github": null,
+      "portfolio": null
+    },
+    "education": [
+      {
+        "institution": "Universitas Gadjah Mada - Sleman, Daerah Istimewa Yogyakarta  (Expected)",
+        "degree": "Undergraduate Student",
+        "field": "Biomedical Engineering, Universitas Gadjah Mada (5th semester)",
+        "date_range": {
+          "start": "2023-07-16",
+          "end": "2027-07-16"
+        },
+        "gpa": null
+      },
+      {
+        "institution": "SMA Negeri 3 Surakarta - Jebres, Surakarta, Jawa Tengah",
+        "degree": null,
+        "field": null,
+        "date_range": {
+          "start": "2021-07-16",
+          "end": "2023-05-16"
+        },
+        "gpa": null
+      }
+    ],
+    "experience": [
+      {
+        "company": "Keluarga Mahasiswa Teknik Elektro dan Teknologi Informasi (KMTETI)",
+        "role": "Treasurer of Interest and Talent Division",
+        "date_range": {
+          "start": "2024-01-16",
+          "end": "Present"
+        },
+        "descriptions": [
+          "Managed budget planning, expense tracking, and financial reporting",
+          "Coordinated fund allocation for events and activities",
+          "Collaborated with members and leaders to ensure program success"
+        ]
+      },
+      {
+        "company": "Badan Eksekutif Mahasiswa Keluarga Fakultas Teknik (BEM KMFT)",
+        "role": "Staff – Environmental Division",
+        "date_range": {
+          "start": "2024-01-16",
+          "end": "2025-01-16"
+        },
+        "descriptions": [
+          "Assisted in planning and implementing environmental programs",
+          "Supported event coordination and green campaigns",
+          "Promoted environmentally responsible practices within the organization"
+        ]
+      },
+      {
+        "company": "Christmas Celebration, Faculty of Engineering",
+        "role": "Event Chair",
+        "date_range": {
+          "start": "2024-10-16",
+          "end": "2024-12-16"
+        },
+        "descriptions": [
+          "An annual Christmas Celebration for students of the Faculty of Engineering, fostering togetherness, spirituality, and engagement through",
+          "worship and performances.",
+          "Led planning, coordination, and execution of the event",
+          "Managed committees and delegated tasks effectively",
+          "Oversaw budgeting, logistics, and stakeholder communication"
+        ]
+      },
+      {
+        "company": "Engineering Stage",
+        "role": "Coordinator of Event Division",
+        "date_range": {
+          "start": "2024-03-16",
+          "end": "2024-08-16"
+        },
+        "descriptions": [
+          "Campus Introduction event for new student, featured a theater performance and public lecture talk show with prominent speakers",
+          "Coordinated event program design and execution",
+          "Supervised members and delegated tasks",
+          "Collaborated with divisions to align objectives and logistics"
+        ]
+      },
+      {
+        "company": "NESCO UGM",
+        "role": "Staff of Event Division",
+        "date_range": {
+          "start": "2023-10-16",
+          "end": "2024-05-16"
+        },
+        "descriptions": [
+          "National-level competition for electrical engineering students organized by DTETI UGM",
+          "Assisted in planning and executing competition programs",
+          "Coordinated participants, judges, and logistics",
+          "Collaborated with team for smooth event implementation"
+        ]
+      }
+    ],
+    "skills": {
+      "technical_skills": [
+        "C",
+        "C++",
+        "Data Analysis",
+        "MATLAB",
+        "NumPy",
+        "Pandas",
+        "Python"
+      ],
+      "soft_skills": [
+        "Adaptability",
+        "Attention to Detail",
+        "Collaboration",
+        "Communication",
+        "Creativity",
+        "Critical Thinking",
+        "Leadership",
+        "Organization",
+        "Planning",
+        "Presentation",
+        "Public Speaking",
+        "Research",
+        "Teamwork",
+        "Time Management"
+      ],
+      "tools": [],
+      "languages": []
+    },
+    "projects": [],
+    "certifications": [
+      {
+        "name": "Biomedical Image Analysis in Python",
+        "type": "course",
+        "issuer": null,
+        "date_range": {
+          "start": "2025-05-16",
+          "end": null
+        },
+        "descriptions": []
+      }
+    ]
+  },
+  "scores": {
+    "overall_score": 50.2,
+    "skill_score": 57.8,
+    "experience_score": 75.0,
+    "education_score": 70.0,
+    "project_score": 0.0,
+    "completeness_score": 70.0,
+    "parsing_quality_score": 100.0,
+    "explanation": "Skill set cukup baik, masih ada ruang untuk berkembang. Pengalaman kerja cukup, pertimbangkan menambah deskripsi dan durasi. Informasi pendidikan ada, tapi belum lengkap (degree, field, atau GPA mungkin hilang). Tambahkan proyek pribadi atau open-source untuk memperkuat CV. CV cukup lengkap; pertimbangkan menambahkan LinkedIn, GitHub, atau portfolio."
+  },
+  "job_recommendations": [
+    {
+      "role": "Content Writer",
+      "category": "Marketing & Communication",
+      "match_score": 46.7,
+      "matched_skills": [
+        "Research",
+        "Communication"
+      ],
+      "missing_skills": [
+        "Writing"
+      ],
+      "reason": "Profil Anda berpotensi cocok untuk posisi Content Writer di bidang Marketing & Communication. Skill yang relevan: Research, Communication. Skill yang perlu ditingkatkan: Writing.",
+      "improvement_suggestions": [
+        "Pelajari Writing untuk memenuhi persyaratan utama role ini.",
+        "Mempelajari SEO akan meningkatkan daya saing Anda.",
+        "Mempelajari Copywriting akan meningkatkan daya saing Anda."
+      ]
+    },
+    {
+      "role": "Business Analyst",
+      "category": "Product & Business",
+      "match_score": 35.0,
+      "matched_skills": [
+        "Communication",
+        "Data Analysis"
+      ],
+      "missing_skills": [
+        "Analytical Thinking",
+        "Microsoft Excel"
+      ],
+      "reason": "Profil Anda perlu pengembangan lebih lanjut untuk untuk posisi Business Analyst di bidang Product & Business. Skill yang relevan: Communication, Data Analysis. Skill yang perlu ditingkatkan: Analytical Thinking, Microsoft Excel.",
+      "improvement_suggestions": [
+        "Pelajari Analytical Thinking untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Microsoft Excel untuk memenuhi persyaratan utama role ini.",
+        "Mempelajari SQL akan meningkatkan daya saing Anda.",
+        "Mempelajari Power BI akan meningkatkan daya saing Anda."
+      ]
+    },
+    {
+      "role": "Human Resource Specialist",
+      "category": "Human Resources",
+      "match_score": 35.0,
+      "matched_skills": [
+        "Communication",
+        "Organization"
+      ],
+      "missing_skills": [
+        "Interpersonal Skills",
+        "Microsoft Office"
+      ],
+      "reason": "Profil Anda perlu pengembangan lebih lanjut untuk untuk posisi Human Resource Specialist di bidang Human Resources. Skill yang relevan: Communication, Organization. Skill yang perlu ditingkatkan: Interpersonal Skills, Microsoft Office.",
+      "improvement_suggestions": [
+        "Pelajari Interpersonal Skills untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Microsoft Office untuk memenuhi persyaratan utama role ini.",
+        "Mempelajari Recruitment akan meningkatkan daya saing Anda.",
+        "Mempelajari Performance Management akan meningkatkan daya saing Anda."
+      ]
+    },
+    {
+      "role": "Data Scientist",
+      "category": "Data & Analytics",
+      "match_score": 34.7,
+      "matched_skills": [
+        "Python",
+        "Data Analysis",
+        "Pandas",
+        "Numpy"
+      ],
+      "missing_skills": [
+        "Machine Learning",
+        "Sql",
+        "Statistical Analysis"
+      ],
+      "reason": "Profil Anda perlu pengembangan lebih lanjut untuk untuk posisi Data Scientist di bidang Data & Analytics. Skill yang relevan: Python, Data Analysis, Pandas, Numpy. Skill yang perlu ditingkatkan: Machine Learning, Sql, Statistical Analysis.",
+      "improvement_suggestions": [
+        "Pelajari Machine Learning untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Sql untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Statistical Analysis untuk memenuhi persyaratan utama role ini.",
+        "Mempelajari R akan meningkatkan daya saing Anda.",
+        "Mempelajari Deep Learning akan meningkatkan daya saing Anda."
+      ]
+    },
+    {
+      "role": "Data Analyst",
+      "category": "Data & Analytics",
+      "match_score": 27.5,
+      "matched_skills": [
+        "Data Analysis",
+        "Python",
+        "Pandas",
+        "Numpy"
+      ],
+      "missing_skills": [
+        "Sql",
+        "Data Visualization",
+        "Microsoft Excel"
+      ],
+      "reason": "Profil Anda perlu pengembangan lebih lanjut untuk untuk posisi Data Analyst di bidang Data & Analytics. Skill yang relevan: Data Analysis, Python, Pandas, Numpy. Skill yang perlu ditingkatkan: Sql, Data Visualization, Microsoft Excel.",
+      "improvement_suggestions": [
+        "Pelajari Sql untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Data Visualization untuk memenuhi persyaratan utama role ini.",
+        "Pelajari Microsoft Excel untuk memenuhi persyaratan utama role ini.",
+        "Mempelajari Python akan meningkatkan daya saing Anda.",
+        "Mempelajari R akan meningkatkan daya saing Anda."
+      ]
+    }
+  ],
+  "ai_summary": {
+    "profile_summary": "Nama kandidat: Deona Gracia Putri Bidang studi: Biomedical Engineering, Universitas Gadjah Mada (5th semester) Keahlian utama: C, C++, Data Analysis, MATLAB, NumPy Soft skills: Adaptability, Attention to Detail, Collaboration, Communication, Creativity, Critical Thinking Jumlah pengalaman: 1. Staff – Environmental Division, BEM KMFT, 2024-2025 2. Coordinator of Event Division, Engineering Stage, 2024-2024 3.",
+    "strengths": [
+      "Memiliki pengalaman organisasi yang kuat dalam pengelolaan anggaran, koordinasi acara, dan kerja tim.",
+      "Memiliki dasar teknis yang relevan dengan rekomendasi role teratas, seperti C, C++, Data Analysis, MATLAB, NumPy, Pandas, dan Python.",
+      "Menunjukkan kemampuan communication, leadership, planning, dan time management melalui berbagai peran kepanitiaan dan organisasi."
+    ],
+    "areas_for_improvement": [
+      "Pelajari Writing untuk meningkatkan kecocokan dengan role Content Writer.",
+      "Pelajari Analytical Thinking untuk meningkatkan kecocokan dengan role Business Analyst.",
+      "Pelajari Microsoft Excel untuk meningkatkan kecocokan dengan role Business Analyst.",
+      "Pelajari Interpersonal Skills untuk meningkatkan kecocokan dengan role Human Resource Specialist."
+    ]
+  },
+  "metadata": {
+    "file_type": "pdf",
+    "extraction_method": "native",
+    "extraction_quality": "good",
+    "total_pages": 1
+  }
+}

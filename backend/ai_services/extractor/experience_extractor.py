@@ -8,6 +8,12 @@ from .date_utils import extract_date_range, parse_date_range, DATE_RANGE, DATE_T
 
 BULLET = re.compile(r"^[\u2022\u2023\u25E6\u2043\u2219•\-\*]\s*")
 
+# Matches lines like "Porfio Project (2025): ..."
+RE_PROJECT_LINE = re.compile(r".{2,}(?:project|portofolio|portfolio).{0,30}\(\d{4}\)", re.IGNORECASE)
+
+# Icon / Private Use Area unicode chars (e.g. custom font icons in PDF)
+RE_ICON_CHARS = re.compile(r"[\ue800-\uf8ff]")
+
 _RE_RANGE_OR_DATE = re.compile(
     DATE_RANGE + r"|" + NUMERIC_DATE,
     re.IGNORECASE | re.VERBOSE,
@@ -15,12 +21,51 @@ _RE_RANGE_OR_DATE = re.compile(
 
 _RE_ANY_DATE = re.compile(DATE_TOKEN, re.IGNORECASE)
 
+_NON_EXPERIENCE_PREFIX = re.compile(
+    r"^(?:soft\s+skills?|hard\s+skills?|skills?|technical\s+skills?|tools?|"
+    r"course|courses?|certification|certifications?|certificate|certificates?|"
+    r"training|trainings?)\b",
+    re.IGNORECASE,
+)
+
+_NON_EXPERIENCE_TERMS = re.compile(
+    r"\b(?:soft\s+skills?|hard\s+skills?|technical\s+skills?|course|courses?|"
+    r"certification|certifications?|certificate|certificates?|training|trainings?)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_experience_stop_line(line: str) -> bool:
+    clean = BULLET.sub("", line).strip()
+    if not clean:
+        return False
+    if not _NON_EXPERIENCE_PREFIX.match(clean):
+        return False
+
+    if re.match(
+        r"^(?:soft\s+skills?|hard\s+skills?|skills?|technical\s+skills?|tools?)\s*[:\-]",
+        clean,
+        re.IGNORECASE,
+    ):
+        return True
+    if re.match(
+        r"^(?:course|courses?|certification|certifications?|certificate|certificates?|training|trainings?)\s*(?:[:\-\(]|$)",
+        clean,
+        re.IGNORECASE,
+    ):
+        return True
+    return len(clean.split()) <= 3
+
 
 def _split_blocks(section_lines: list[str]) -> list[str]:
-    clean_lines = [
-        ln for ln in section_lines
-        if not ln.startswith("__SECTION_LABEL__:")
-    ]
+    clean_lines: list[str] = []
+    for ln in section_lines:
+        if ln.startswith("__SECTION_LABEL__:"):
+            continue
+        if _is_experience_stop_line(ln):
+            break
+        clean_lines.append(ln)
+
     if not clean_lines:
         return []
 
@@ -30,7 +75,7 @@ def _split_blocks(section_lines: list[str]) -> list[str]:
             continue
         if BULLET.match(line):
             continue
-        if len(line) > 120:
+        if len(line) > 160:
             continue
         entry_starts.append(i)
 
@@ -50,13 +95,23 @@ def _split_blocks(section_lines: list[str]) -> list[str]:
 def _clean_company(line: str) -> str:
     line = re.sub(DATE_RANGE, "", line, flags=re.IGNORECASE | re.VERBOSE)
     line = re.sub(DATE_TOKEN, "", line, flags=re.IGNORECASE)
+    # Remove icon / private-use unicode characters
+    line = RE_ICON_CHARS.sub("", line)
     parts = line.split(" - ")
     line = parts[0] if parts else line
-    return line.strip(" ,|–")
+    return line.strip(" ,|-")
 
 
 def _parse_experience_block(block: str) -> dict | None:
-    lines = [ln.strip() for ln in block.split("\n") if ln.strip()]
+    lines: list[str] = []
+    for ln in block.split("\n"):
+        clean = ln.strip()
+        if not clean:
+            continue
+        if _is_experience_stop_line(clean):
+            break
+        lines.append(clean)
+
     if not lines:
         return None
 
@@ -103,13 +158,23 @@ def _parse_experience_block(block: str) -> dict | None:
     if not company and not role and not descriptions:
         return None
         
-    # Skip if it looks like a skills or a project
+    # Skip if it looks like a skills, course, certification, or interests section
     first_line_lower = lines[0].lower()
-    if "hard skill" in first_line_lower or "soft skill" in first_line_lower or "technical skill" in first_line_lower:
+    if _NON_EXPERIENCE_TERMS.search(first_line_lower):
         return None
     if "interest" in first_line_lower or "hobbies" in first_line_lower:
         return None
-    if "project" in (company or "").lower() and not role and not date_str:
+    if _NON_EXPERIENCE_TERMS.search(company or "") or _NON_EXPERIENCE_TERMS.search(role or ""):
+        return None
+
+    if RE_PROJECT_LINE.search(lines[0]):
+        return None
+    if re.search(r"project.{0,30}\(\d{4}\)", (company or "").lower()):
+        return None
+    if "project" in (company or "").lower() and not date_str:
+        return None
+    proj_desc_count = sum(1 for d in descriptions if RE_PROJECT_LINE.search(d))
+    if proj_desc_count >= 2:
         return None
 
     return {

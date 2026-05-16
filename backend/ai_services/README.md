@@ -23,13 +23,13 @@ Modul ini memiliki CLI `main.py` yang dapat dijalankan secara langsung.
 ### Menjalankan Tanpa Ollama
 
 ```bash
-python main.py --input sample_cv.pdf --output result.json --no-ollama
+python main.py --input ../../sample_cv.pdf --output result.json --no-ollama
 ```
 Hasil AI (profile summary, strengths, improvement) akan di-generate menggunakan sistem rule-based fallback.
 
 ### Menjalankan Dengan Ollama 
 
 ```bash
-python main.py --input sample_cv.pdf --output result.json --use-ollama
+python main.py --input ../../sample_cv.pdf --output result.json --use-ollama
 ```
-Modul ini akan mencoba menghubungi `http://localhost:11434` menggunakan model `llama3.2:3b`. Jika Ollama mati atau model tidak ditemukan, sistem akan **secara otomatis fallback** ke versi rule-based tanpa menyebabkan error.
+Modul ini akan mencoba menghubungi `http://localhost:11434` menggunakan model `qwen2.5:1.5b`. Jika Ollama unavailable, sistem akan **secara otomatis fallback** ke versi rule-based.
