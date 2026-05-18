@@ -116,6 +116,7 @@ export default function UploadCV() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
+                style={{ padding: '48px', borderRadius: '24px', borderStyle: 'dashed', marginTop: '20px' }}
                 className={`relative border-2 border-dashed rounded-3xl p-12 text-center transition-all ${
                   isDragging
                     ? 'border-primary bg-primary/5'
@@ -241,32 +242,27 @@ export default function UploadCV() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+          style={{ marginTop: '25px' }}
           className="grid md:grid-cols-3 gap-6 mt-12"
         >
-          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
-            <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-2xl">🔒</span>
-            </div>
+          {/* Kotak 1: Aman & Privat */}
+          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
             <h4 className="font-bold mb-2 text-foreground text-left">Aman & Privat</h4>
             <p className="text-sm text-muted-foreground text-left">
               Data CV Anda terenkripsi dan tidak akan dibagikan kepada pihak ketiga
             </p>
           </div>
 
-          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-2xl">⚡</span>
-            </div>
+          {/* Kotak 2: Analisis Cepat */}
+          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
             <h4 className="font-bold mb-2 text-foreground text-left">Analisis Cepat</h4>
             <p className="text-sm text-muted-foreground text-left">
               Dapatkan hasil analisis mendalam dalam hitungan detik menggunakan AI
             </p>
           </div>
 
-          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
-            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-2xl">🎯</span>
-            </div>
+          {/* Kotak 3: Rekomendasi Akurat */}
+          <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
             <h4 className="font-bold mb-2 text-foreground text-left">Rekomendasi Akurat</h4>
             <p className="text-sm text-muted-foreground text-left">
               Temukan peluang karir yang paling sesuai dengan profil dan keahlian Anda
