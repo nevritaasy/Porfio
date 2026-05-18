@@ -73,10 +73,10 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          style={{ marginBottom: '20px' }}
         >
           <h1 className="text-4xl font-bold mb-2 text-foreground">
-            Selamat datang kembali, {user.name}! 👋
+            Selamat datang kembali, {user.name}!
           </h1>
           <p className="text-xl text-muted-foreground">
             Siap untuk menganalisis CV dan menemukan peluang karir terbaik?
@@ -84,7 +84,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-3 gap-6" style={{ marginBottom: '20px' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,6 +143,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
+            style={{ marginBottom: '20px' }}
             className="bg-secondary rounded-3xl p-8 text-secondary-foreground shadow-md"
           >
             <div className="flex items-start justify-between">
@@ -169,7 +170,7 @@ export default function Dashboard() {
                     Lihat Hasil Analisis
                   </button>
                   <button
-                    onClick={() => router.push('/upload')}
+                    onClick={() => router.push('/upload-cv')}
                     className="px-8 py-3 bg-secondary-foreground/10 backdrop-blur-sm rounded-xl font-medium hover:bg-secondary-foreground/20 transition-colors"
                   >
                     Upload CV Baru
@@ -188,6 +189,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
+            style={{ marginBottom: '20px' }}
             className="bg-secondary rounded-3xl p-8 text-secondary-foreground shadow-md"
           >
             <div className="flex items-start justify-between">
@@ -219,7 +221,6 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-12"
         >
           <h3 className="text-xl font-bold mb-6 text-foreground">Aksi Cepat</h3>
           <div className="grid md:grid-cols-2 gap-6">
