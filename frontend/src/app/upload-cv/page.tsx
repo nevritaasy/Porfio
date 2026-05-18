@@ -109,6 +109,7 @@ export default function UploadCV() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
+            style={{ marginTop: '20px' }}
           >
             {/* Upload Area */}
             {!file ? (
@@ -221,6 +222,7 @@ export default function UploadCV() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            style={{ padding: '48px', borderRadius: '24px', marginTop: '20px' }}
             className="bg-card rounded-3xl p-12 text-center border-2 border-primary/20 shadow-md"
           >
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">

@@ -76,7 +76,7 @@ export default function Dashboard() {
           style={{ marginBottom: '20px' }}
         >
           <h1 className="text-4xl font-bold mb-2 text-foreground">
-            Selamat datang kembali, {user.name}! 👋
+            Selamat datang kembali, {user.name}!
           </h1>
           <p className="text-xl text-muted-foreground">
             Siap untuk menganalisis CV dan menemukan peluang karir terbaik?
@@ -170,7 +170,7 @@ export default function Dashboard() {
                     Lihat Hasil Analisis
                   </button>
                   <button
-                    onClick={() => router.push('/upload')}
+                    onClick={() => router.push('/upload-cv')}
                     className="px-8 py-3 bg-secondary-foreground/10 backdrop-blur-sm rounded-xl font-medium hover:bg-secondary-foreground/20 transition-colors"
                   >
                     Upload CV Baru
