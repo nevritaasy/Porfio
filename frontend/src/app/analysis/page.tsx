@@ -120,7 +120,7 @@ export default function Analysis() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-secondary rounded-3xl p-8 text-secondary-foreground shadow-md border border-secondary"
+              className="bg-secondary rounded-3xl px-8 py-12 mb-8 text-secondary-foreground shadow-md border border-secondary"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -138,7 +138,7 @@ export default function Analysis() {
                 </div>
                 <div className="hidden md:block">
                   <div className="w-40 h-40 relative">
-                    <svg className="w-full h-full transform -rotate-90">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
                       <circle
                         cx="80" cy="80" r="70"
                         stroke="rgba(255,255,255,0.1)"
@@ -146,10 +146,10 @@ export default function Analysis() {
                       />
                       <motion.circle
                         cx="80" cy="80" r="70"
-                        stroke="#DB924C" /* Warna Primary */
+                        stroke="#DB924C"
                         strokeWidth="12" fill="none"
                         strokeLinecap="round"
-                        initial={{ strokeDasharray: '439.6', strokeDashoffset: '439.6' }}
+                        initial={{ strokeDasharray: 439.6, strokeDashoffset: 439.6 }}
                         animate={{
                           strokeDashoffset: 439.6 - (439.6 * analysis.overallScore) / 100,
                         }}
@@ -194,7 +194,7 @@ export default function Analysis() {
               </motion.div>
 
               {/* Job Recommendations - 2 Columns */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-6 mb-10">
                 <div className="flex items-center gap-2 mb-2">
                   <Target className="w-6 h-6 text-secondary" />
                   <h2 className="text-2xl font-bold">Rekomendasi Pekerjaan</h2>
@@ -238,12 +238,12 @@ export default function Analysis() {
             </div>
 
             {/* Strengths & Weaknesses */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="flex flex-col sm:flex-row gap-6 w-full mt-8">
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6 }}
-                className="bg-card rounded-2xl p-6 border border-border"
+                className="flex-1 bg-card rounded-2xl p-6 border border-border shadow-sm"
               >
                 <div className="flex items-center gap-2 mb-4 text-secondary">
                   <Award className="size-5" />
@@ -251,9 +251,9 @@ export default function Analysis() {
                 </div>
                 <ul className="space-y-3">
                   {analysis.strengths.map((str: string, i: number) => (
-                    <li key={i} className="flex gap-3 text-sm text-foreground/80 text-left">
-                      <span className="size-1.5 bg-primary rounded-full mt-2 shrink-0" />
-                      {str}
+                    <li key={i} className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full">
+                      <span className="size-1.5 bg-secondary rounded-full mt-2 shrink-0" />
+                      <span className="flex-1">{str}</span>
                     </li>
                   ))}
                 </ul>
@@ -263,7 +263,7 @@ export default function Analysis() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.7 }}
-                className="bg-card rounded-2xl p-6 border border-border"
+                className="flex-1 bg-card rounded-2xl p-6 border border-border shadow-sm"
               >
                 <div className="flex items-center gap-2 mb-4 text-accent">
                   <AlertCircle className="size-5" />
@@ -271,9 +271,9 @@ export default function Analysis() {
                 </div>
                 <ul className="space-y-3">
                   {analysis.improvements.map((imp: string, i: number) => (
-                    <li key={i} className="flex gap-3 text-sm text-foreground/80 text-left">
+                    <li key={i} className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full">
                       <span className="size-1.5 bg-accent rounded-full mt-2 shrink-0" />
-                      {imp}
+                      <span className="flex-1">{imp}</span>
                     </li>
                   ))}
                 </ul>
@@ -281,19 +281,21 @@ export default function Analysis() {
             </div>
 
             {/* Final Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 border-t border-border">
-              <button
-                onClick={() => router.push('/upload-cv')}
-                className="px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition-all"
-              >
-                Ganti File CV
-              </button>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="px-8 py-3 bg-secondary text-secondary-foreground rounded-xl font-bold hover:opacity-90 shadow-sm transition-all"
-              >
-                Selesai & Ke Dashboard
-              </button>
+            <div style={{ marginTop: '30px', paddingBottom: '120px' }} className="w-full">
+              <div className="border-t border-foreground/10 pt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => router.push('/upload-cv')}
+                  className="px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition-all shadow-sm"
+                >
+                  Ganti File CV
+                </button>
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="px-8 py-3 bg-secondary text-secondary-foreground rounded-xl font-bold hover:opacity-90 shadow-sm transition-all"
+                >
+                  Selesai & Ke Dashboard
+                </button>
+              </div>
             </div>
           </div>
         )}
