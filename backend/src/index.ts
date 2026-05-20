@@ -3,7 +3,7 @@ import cors from 'cors';
 import compression from 'compression';
 import morgan from 'morgan';
 
-
+import routes from './routes/index.js';
 
 const app = express();
 const port = 8080;
