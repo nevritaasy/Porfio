@@ -6,10 +6,6 @@ import type { Request, Response, NextFunction, RequestHandler } from 'express';
 
 import { UPLOAD_DIR, MAX_FILE_SIZE_BYTES } from '../config/multer.js';
 
-
-
-// ─── Controller ───────────────────────────────────────────────────────────────
-
 export const receivePdf = (req: Request, res: Response): void => {
   const file = req.file;
 
