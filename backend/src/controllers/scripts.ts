@@ -1,8 +1,8 @@
 import { spawn, spawnSync } from "child_process";
+import fs from "fs";
+import os from "os";
 import path from "path";
 import type { Request, Response } from "express";
-
-import { UPLOAD_DIR } from "../config/multer.js";
 
 const SCRIPT_PATH = path.resolve(process.cwd(), "ai_services", "main.py");
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
@@ -68,10 +68,18 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const pdfPath = path.join(UPLOAD_DIR, uploadedFile.filename);
   const useOllama = getUseOllama(req);
   const pythonCommand = resolvePythonCommand();
-  const pythonArgs = [...pythonCommand.args, SCRIPT_PATH, "--input", pdfPath];
+  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "porfio-"));
+  const tempPdfPath = path.join(tempDir, path.basename(uploadedFile.originalname).replace(/[^a-zA-Z0-9._-]/g, "_"));
+
+  await fs.promises.writeFile(tempPdfPath, uploadedFile.buffer);
+
+  const cleanupTempFile = async (): Promise<void> => {
+    await fs.promises.rm(tempDir, { recursive: true, force: true });
+  };
+
+  const pythonArgs = [...pythonCommand.args, SCRIPT_PATH, "--input", tempPdfPath];
 
   if (useOllama) {
     pythonArgs.splice(1, 0, "--use-ollama");
@@ -89,6 +97,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (err) {
     console.error("Failed to spawn Python process:", err);
+    await cleanupTempFile();
     res
       .status(500)
       .json({
@@ -107,6 +116,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
       resolved = true;
       python.kill();
       console.error("Python process timed out.");
+      void cleanupTempFile();
       res.status(504).json({ error: "Processing timed out." });
     }
   }, TIMEOUT_MS);
@@ -122,6 +132,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
         clearTimeout(timeout);
         python.kill();
         console.error("Python process output exceeded max buffer size.");
+        void cleanupTempFile();
         res.status(500).json({ error: "Output too large." });
       }
       return;
@@ -139,6 +150,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
       resolved = true;
       clearTimeout(timeout);
       console.error("Python process error:", err);
+      void cleanupTempFile();
       if ((err as NodeJS.ErrnoException).code === "ENOENT") {
         res
           .status(500)
@@ -160,20 +172,24 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
 
     if (signal !== null) {
       console.error(`Python process was killed by signal: ${signal}`);
+      void cleanupTempFile();
       res.status(500).json({ error: `Process killed by signal: ${signal}` });
       return;
     }
 
     if (code !== 0) {
       console.error(`Python process exited with code ${code}`);
+      void cleanupTempFile();
       res.status(500).json({ error: `Script failed with exit code ${code}` });
       return;
     }
 
     try {
+      void cleanupTempFile();
       res.json(JSON.parse(result));
     } catch (err) {
       console.error("Failed to parse Python JSON output:", err);
+      void cleanupTempFile();
       res
         .status(500)
         .json({
