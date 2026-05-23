@@ -4,7 +4,8 @@ import os from "os";
 import path from "path";
 import type { Request, Response } from "express";
 
-import { sanitizeUser, findSessionFromRequest } from "./auth.js";
+import { sanitizeUser } from "../services/authServices.js"
+import { findSessionFromRequest } from "../services/sessionServices.js";
 import prisma from "../lib/prisma.js";
 
 const SCRIPT_PATH = path.resolve(process.cwd(), "ai_services", "main.py");
