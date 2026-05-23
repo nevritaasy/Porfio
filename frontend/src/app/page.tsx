@@ -38,12 +38,6 @@ export default function Landing() {
           className="flex gap-3"
         >
           <button
-            onClick={() => router.push('/lofi')}
-            className="px-4 py-2 text-sm bg-card text-card-foreground rounded-lg hover:bg-muted transition-colors border border-border shadow-sm"
-          >
-            View Lo-Fi
-          </button>
-          <button
             onClick={() => router.push('/login')}
             className="px-6 py-2 rounded-lg hover:bg-muted transition-colors font-medium"
           >
@@ -108,9 +102,6 @@ export default function Landing() {
               Mulai Sekarang
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="px-8 py-4 bg-card text-card-foreground border border-border rounded-xl hover:bg-muted transition-colors font-medium shadow-sm">
-              Lihat Demo
-            </button>
           </motion.div>
         </div>
 
@@ -149,8 +140,7 @@ export default function Landing() {
             </div>
             <h3 className="text-xl font-bold mb-3">Rekomendasi Personal</h3>
             <p className="text-foreground/70">
-              Temukan pekerjaan yang paling cocok dengan profil Anda, lengkap dengan estimasi gaji
-              dan tips.
+              Temukan pekerjaan yang paling cocok dengan profil Anda.
             </p>
           </div>
         </motion.div>
