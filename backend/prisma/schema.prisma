@@ -18,6 +18,7 @@ model User {
   password  String
 
   analyses  Analysis[]
+  sessions  Session[]
 }
 
 model Analysis {
@@ -28,4 +29,13 @@ model Analysis {
   user      User     @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
 }
