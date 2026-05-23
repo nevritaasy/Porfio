@@ -25,6 +25,21 @@ from llm.prompt_templates import (
     build_improvement_prompt,
 )
 
+
+def _configure_utf8_stdio() -> None:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+    try:
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
+
+_configure_utf8_stdio()
+
 def _generate_fallback_summary(scores: dict, recommendations: list, cv_data: dict | None = None) -> dict:
     # Generate a rule-based fallback summary when Ollama is unavailable.
     cv_data = cv_data or {}
