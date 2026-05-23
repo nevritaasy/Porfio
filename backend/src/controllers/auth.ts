@@ -15,7 +15,7 @@ function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
-function sanitizeUser(user: {
+export function sanitizeUser(user: {
   id: string;
   name: string;
   email: string;
@@ -96,7 +96,7 @@ async function createSession(userId: string) {
   return { token, session };
 }
 
-async function findSessionFromRequest(req: Request) {
+export async function findSessionFromRequest(req: Request) {
   const token = getCookieValue(req, SESSION_COOKIE_NAME);
   if (!token) {
     return null;

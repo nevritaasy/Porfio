@@ -4,6 +4,9 @@ import os from "os";
 import path from "path";
 import type { Request, Response } from "express";
 
+import { sanitizeUser, findSessionFromRequest } from "./auth.js";
+import prisma from "../lib/prisma.js";
+
 const SCRIPT_PATH = path.resolve(process.cwd(), "ai_services", "main.py");
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
 const TIMEOUT_MS = 30_000;
@@ -58,20 +61,28 @@ function getUseOllama(req: Request): boolean {
 
 const processScript = async (req: Request, res: Response): Promise<void> => {
   const uploadedFile = req.file;
+  const session = await findSessionFromRequest(req);
+  if (!session) {
+    res.status(401).json({ error: "Not authenticated." });
+    return;
+  }
+
+  const user = sanitizeUser(session.user);
 
   if (!uploadedFile) {
-    res
-      .status(400)
-      .json({
-        error: 'No file uploaded. Expected a PDF under the "file" field.',
-      });
+    res.status(400).json({
+      error: 'No file uploaded. Expected a PDF under the "file" field.',
+    });
     return;
   }
 
   const useOllama = getUseOllama(req);
   const pythonCommand = resolvePythonCommand();
   const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "porfio-"));
-  const tempPdfPath = path.join(tempDir, path.basename(uploadedFile.originalname).replace(/[^a-zA-Z0-9._-]/g, "_"));
+  const tempPdfPath = path.join(
+    tempDir,
+    path.basename(uploadedFile.originalname).replace(/[^a-zA-Z0-9._-]/g, "_"),
+  );
 
   await fs.promises.writeFile(tempPdfPath, uploadedFile.buffer);
 
@@ -79,7 +90,12 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     await fs.promises.rm(tempDir, { recursive: true, force: true });
   };
 
-  const pythonArgs = [...pythonCommand.args, SCRIPT_PATH, "--input", tempPdfPath];
+  const pythonArgs = [
+    ...pythonCommand.args,
+    SCRIPT_PATH,
+    "--input",
+    tempPdfPath,
+  ];
 
   if (useOllama) {
     pythonArgs.splice(1, 0, "--use-ollama");
@@ -98,11 +114,9 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     console.error("Failed to spawn Python process:", err);
     await cleanupTempFile();
-    res
-      .status(500)
-      .json({
-        error: (err as Error).message || "Failed to start processing script.",
-      });
+    res.status(500).json({
+      error: (err as Error).message || "Failed to start processing script.",
+    });
     return;
   }
 
@@ -140,7 +154,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     result += data.toString();
   });
 
-  // Log stderr but don't expose it to the client
+  // Log stderr
   python.stderr?.on("data", (data: Buffer) => {
     console.error(`[python stderr]: ${data.toString().trim()}`);
   });
@@ -152,19 +166,16 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
       console.error("Python process error:", err);
       void cleanupTempFile();
       if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-        res
-          .status(500)
-          .json({
-            error:
-              "Failed to run processing script. Python was not found on PATH.",
-          });
+        res.status(500).json({
+          error:
+            "Failed to run processing script. Python was not found on PATH.",
+        });
         return;
       }
       res.status(500).json({ error: "Failed to run processing script." });
     }
   });
 
-  // 'close' fires after all stdio streams have ended — safe to send response here
   python.on("close", (code: number | null, signal: NodeJS.Signals | null) => {
     if (resolved) return;
     resolved = true;
@@ -185,17 +196,32 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     }
 
     try {
+      const parsedResult = JSON.parse(result);
       void cleanupTempFile();
-      res.json(JSON.parse(result));
+
+      void (async () => {
+        try {
+          await prisma.analysis.create({
+            data: {
+              content: parsedResult,
+              userId: user.id,
+            },
+          });
+          res.json(parsedResult);
+        } catch (saveError) {
+          console.error("Failed to save analysis:", saveError);
+          res.status(500).json({
+            error: "Processing succeeded but saving analytics failed.",
+          });
+        }
+      })();
     } catch (err) {
       console.error("Failed to parse Python JSON output:", err);
       void cleanupTempFile();
-      res
-        .status(500)
-        .json({
-          error: "Processing script returned invalid JSON.",
-          raw: result,
-        });
+      res.status(500).json({
+        error: "Processing script returned invalid JSON.",
+        raw: result,
+      });
     }
   });
 };
