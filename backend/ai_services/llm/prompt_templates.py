@@ -9,6 +9,19 @@ def _display_name(name: str) -> str:
     return name.title() if name and name.isupper() else name
 
 
+def _normalize_text_list(values: list | None) -> list[str]:
+    if not values:
+        return []
+    normalized: list[str] = []
+    for value in values:
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
 def _compact_experience(exp_entries: list[dict]) -> list[dict]:
     compact: list[dict] = []
     for exp in exp_entries[:5]:
@@ -49,9 +62,9 @@ def build_profile_summary_prompt(cv_data: dict, scores: dict) -> str:
 
     exp_entries = cv_data.get("experience", [])
 
-    tech_skills = cv_data.get("skills", {}).get("technical_skills", [])[:5]
-    soft_skills = cv_data.get("skills", {}).get("soft_skills", [])[:6]
-    tools       = cv_data.get("skills", {}).get("tools", [])[:4]
+    tech_skills = _normalize_text_list(cv_data.get("skills", {}).get("technical_skills", []))[:5]
+    soft_skills = _normalize_text_list(cv_data.get("skills", {}).get("soft_skills", []))[:6]
+    tools = _normalize_text_list(cv_data.get("skills", {}).get("tools", []))[:4]
     skills_str  = ", ".join(tech_skills + tools) or "tidak terdeteksi"
     certs = [c.get("name") for c in cv_data.get("certifications", [])[:3] if c.get("name")]
     experience_json = json.dumps(_compact_experience(exp_entries), ensure_ascii=False)
@@ -90,11 +103,11 @@ def build_strengths_prompt(cv_data: dict, scores: dict) -> str:
     contact = cv_data.get("contact", {})
     name = _display_name(contact.get("name") or "Kandidat")
 
-    tech_skills = cv_data.get("skills", {}).get("technical_skills", [])[:6]
-    soft_skills = cv_data.get("skills", {}).get("soft_skills", [])[:4]
-    tools       = cv_data.get("skills", {}).get("tools", [])[:4]
-    proj_names  = [p.get("name", "") for p in cv_data.get("projects", [])[:3]]
-    exp_roles   = [e.get("role", "") for e in cv_data.get("experience", [])[:3]]
+    tech_skills = _normalize_text_list(cv_data.get("skills", {}).get("technical_skills", []))[:6]
+    soft_skills = _normalize_text_list(cv_data.get("skills", {}).get("soft_skills", []))[:4]
+    tools = _normalize_text_list(cv_data.get("skills", {}).get("tools", []))[:4]
+    proj_names = _normalize_text_list([p.get("name") for p in cv_data.get("projects", [])[:3]])
+    exp_roles = _normalize_text_list([e.get("role") for e in cv_data.get("experience", [])[:3]])
 
     tech_str  = ", ".join(tech_skills) or "tidak ada"
     soft_str  = ", ".join(soft_skills) or "tidak ada"
@@ -138,10 +151,15 @@ def build_improvement_prompt(cv_data: dict, scores: dict, recommendations: list[
     top_roles: list[str] = []
     relevant_recs = _relevant_recommendations(recommendations)
     for rec in relevant_recs:
-        top_roles.append(rec.get("role", ""))
+        role = rec.get("role")
+        if role is not None:
+            top_roles.append(str(role).strip())
         for sk in rec.get("missing_skills", [])[:2]:
-            if sk not in missing_skills:
-                missing_skills.append(sk)
+            if sk is None:
+                continue
+            skill = str(sk).strip()
+            if skill and skill not in missing_skills:
+                missing_skills.append(skill)
     missing_str = ", ".join(missing_skills[:5]) or "tidak ada"
     roles_str   = ", ".join(top_roles[:3]) or "tidak diketahui"
 

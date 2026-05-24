@@ -172,9 +172,26 @@ def _format_list(items: list[str]) -> str:
     return ", ".join(clean[:-1]) + f", dan {clean[-1]}"
 
 
+def _normalize_text_list(values: list | None) -> list[str]:
+    if not values:
+        return []
+    normalized: list[str] = []
+    for value in values:
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
 def _experience_focuses(cv_data: dict) -> list[str]:
     corpus = " ".join(
-        " ".join([exp.get("role") or "", exp.get("company") or ""] + (exp.get("descriptions") or []))
+        " ".join(
+            _normalize_text_list(
+                [exp.get("role"), exp.get("company"), *(exp.get("descriptions") or [])]
+            )
+        )
         for exp in cv_data.get("experience", []) or []
     ).lower()
     focuses: list[str] = []
@@ -215,7 +232,7 @@ def _build_grounded_profile_summary(cv_data: dict) -> str:
     if tech:
         second_parts.append(f"memiliki dasar teknis dalam {tech}")
     exp_corpus = " ".join(
-        " ".join(exp.get("descriptions") or [])
+        " ".join(_normalize_text_list(exp.get("descriptions") or []))
         for exp in cv_data.get("experience", []) or []
     ).lower()
     org_capabilities: list[str] = []
@@ -558,7 +575,7 @@ def main():
     output_path = args.output
     
     # Default to not using Ollama unless explicitly requested
-    use_ollama = args.use_ollama
+    use_ollama = True # Hardcode true
 
     try:
         result = process_cv(input_path, use_ollama=use_ollama)
