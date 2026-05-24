@@ -9,6 +9,14 @@ import routes from "./routes/index.js";
 const app = express();
 const port = 8080;
 
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+app.use(
+  morgan(isDevelopment ? "dev" : "combined", {
+    immediate: false,
+  }),
+);
+
 app.use(
   cors({
     origin: true,
@@ -16,7 +24,6 @@ app.use(
   }),
 );
 app.use(compression());
-app.use(morgan("combined"));
 app.use(express.json());
 
 // Routes
@@ -34,22 +41,22 @@ async function testDatabaseConnection() {
   }
 }
 
-testDatabaseConnection();
+// testDatabaseConnection();
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-process.on("SIGINT", async () => {
-  console.log("Shutting down gracefully...");
-  await prisma.$disconnect();
-  console.log("Database disconnected");
-  process.exit(0);
-});
+// process.on("SIGINT", async () => {
+//   console.log("Shutting down gracefully...");
+//   await prisma.$disconnect();
+//   console.log("Database disconnected");
+//   process.exit(0);
+// });
 
-process.on("SIGTERM", async () => {
-  console.log("Shutting down gracefully...");
-  await prisma.$disconnect();
-  console.log("Database disconnected");
-  process.exit(0);
-});
+// process.on("SIGTERM", async () => {
+//   console.log("Shutting down gracefully...");
+//   await prisma.$disconnect();
+//   console.log("Database disconnected");
+//   process.exit(0);
+// });

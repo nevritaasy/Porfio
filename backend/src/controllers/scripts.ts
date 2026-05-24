@@ -4,13 +4,13 @@ import os from "os";
 import path from "path";
 import type { Request, Response } from "express";
 
-import { sanitizeUser } from "../services/authServices.js"
+import { sanitizeUser } from "../services/authServices.js";
 import { findSessionFromRequest } from "../services/sessionServices.js";
 import prisma from "../lib/prisma.js";
 
 const SCRIPT_PATH = path.resolve(process.cwd(), "ai_services", "main.py");
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
-const TIMEOUT_MS = 30_000;
+const TIMEOUT_MS = 100_000;
 
 type PythonCommand = {
   command: string;
@@ -57,7 +57,11 @@ function resolvePythonCommand(): PythonCommand {
 
 function getUseOllama(req: Request): boolean {
   const val = req.query.useOllama ?? req.body?.useOllama;
-  return val === "true" || val === true;
+  if (val === undefined || val === null || val === "") {
+    return true;
+  }
+
+  return !(val === "false" || val === false);
 }
 
 const processScript = async (req: Request, res: Response): Promise<void> => {
@@ -98,9 +102,7 @@ const processScript = async (req: Request, res: Response): Promise<void> => {
     tempPdfPath,
   ];
 
-  if (useOllama) {
-    pythonArgs.splice(1, 0, "--use-ollama");
-  }
+  pythonArgs.push(useOllama ? "--use-ollama" : "--no-ollama");
 
   let python: ReturnType<typeof spawn>;
   try {
