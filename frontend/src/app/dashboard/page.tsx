@@ -1,18 +1,17 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Upload,
   FileText,
   BarChart3,
   LogOut,
-  User,
   Calendar,
   CheckCircle2,
-} from 'lucide-react';
-import { authService, cvService } from '../services/mockServices';
+} from "lucide-react";
+import { authService, cvService } from "../services/mockServices";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -20,22 +19,41 @@ export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [cvData, setCvData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    setUser(currentUser);
-    setCvData(cvService.getStoredCV());
+    let cancelled = false;
+
+    const loadDashboard = async () => {
+      const currentUser = await authService.getCurrentUser();
+      if (cancelled) return;
+
+      if (!currentUser) {
+        router.push("/login");
+        return;
+      }
+
+      const latestAnalysis = await cvService.getLatestAnalysis();
+      if (cancelled) return;
+
+      setUser(currentUser);
+      setCvData(latestAnalysis);
+      setIsLoading(false);
+    };
+
+    void loadDashboard();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
-  const handleLogout = () => {
-    authService.logout();
-    router.push('/');
+  const handleLogout = async () => {
+    await authService.logout();
+    router.push("/");
   };
 
+  if (isLoading) return null;
   if (!user) return null;
 
   return (
@@ -45,11 +63,11 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-primary-foreground font-bold text-xl">P</span>
+              <span className="text-primary-foreground font-bold text-xl">
+                P
+              </span>
             </div>
-            <span className="text-2xl font-bold text-secondary">
-              Porfio
-            </span>
+            <span className="text-2xl font-bold text-secondary">Porfio</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -73,7 +91,7 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{ marginBottom: '20px' }}
+          style={{ marginBottom: "20px" }}
         >
           <h1 className="text-4xl font-bold mb-2 text-foreground">
             Selamat datang kembali, {user.name}!
@@ -84,7 +102,10 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6" style={{ marginBottom: '20px' }}>
+        <div
+          className="grid md:grid-cols-3 gap-6"
+          style={{ marginBottom: "20px" }}
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -97,7 +118,9 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">CV Diupload</p>
-                <p className="text-2xl font-bold text-foreground">{cvData ? '1' : '0'}</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {cvData ? "1" : "0"}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -113,8 +136,12 @@ export default function Dashboard() {
                 <BarChart3 className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Analisis Selesai</p>
-                <p className="text-2xl font-bold text-foreground">{cvData ? '1' : '0'}</p>
+                <p className="text-sm text-muted-foreground">
+                  Analisis Selesai
+                </p>
+                <p className="text-2xl font-bold text-foreground">
+                  {cvData ? "1" : "0"}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -131,7 +158,9 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Rekomendasi</p>
-                <p className="text-2xl font-bold text-foreground">{cvData ? '3' : '0'}</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {cvData ? "3" : "0"}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -143,7 +172,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            style={{ marginBottom: '20px' }}
+            style={{ marginBottom: "20px" }}
             className="bg-secondary rounded-3xl p-8 text-secondary-foreground shadow-md"
           >
             <div className="flex items-start justify-between">
@@ -152,25 +181,31 @@ export default function Dashboard() {
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                   <span className="text-sm font-medium">CV Tersimpan</span>
                 </div>
-                <h2 className="text-3xl font-bold mb-3">CV Anda Sudah Terupload</h2>
-                <p className="text-secondary-foreground/80 mb-2">File: {cvData.fileName}</p>
+                <h2 className="text-3xl font-bold mb-3">
+                  CV Anda Sudah Terupload
+                </h2>
+                <p className="text-secondary-foreground/80 mb-2">
+                  Analisis terbaru tersedia di backend.
+                </p>
                 <p className="text-secondary-foreground/80 mb-6 flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {new Date(cvData.uploadedAt).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+                  {cvData.uploadedAt
+                    ? new Date(cvData.uploadedAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : "Baru saja"}
                 </p>
                 <div className="flex gap-4">
                   <button
-                    onClick={() => router.push('/analysis')}
+                    onClick={() => router.push("/analysis")}
                     className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-all shadow-sm"
                   >
                     Lihat Hasil Analisis
                   </button>
                   <button
-                    onClick={() => router.push('/upload-cv')}
+                    onClick={() => router.push("/upload-cv")}
                     className="px-8 py-3 bg-secondary-foreground/10 backdrop-blur-sm rounded-xl font-medium hover:bg-secondary-foreground/20 transition-colors"
                   >
                     Upload CV Baru
@@ -189,18 +224,21 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            style={{ marginBottom: '20px' }}
+            style={{ marginBottom: "20px" }}
             className="bg-secondary rounded-3xl p-8 text-secondary-foreground shadow-md"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h2 className="text-3xl font-bold mb-3">Mulai Analisis CV Anda</h2>
+                <h2 className="text-3xl font-bold mb-3">
+                  Mulai Analisis CV Anda
+                </h2>
                 <p className="text-secondary-foreground/80 mb-6 max-w-2xl">
-                  Upload CV Anda dan dapatkan analisis mendalam tentang skills, pengalaman, dan
-                  rekomendasi pekerjaan yang paling cocok untuk profil Anda.
+                  Upload CV Anda dan dapatkan analisis mendalam tentang skills,
+                  pengalaman, dan rekomendasi pekerjaan yang paling cocok untuk
+                  profil Anda.
                 </p>
                 <button
-                  onClick={() => router.push('/upload-cv')}
+                  onClick={() => router.push("/upload-cv")}
                   className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-all flex items-center gap-2 shadow-sm"
                 >
                   <Upload className="w-5 h-5" />
@@ -225,7 +263,7 @@ export default function Dashboard() {
           <h3 className="text-xl font-bold mb-6 text-foreground">Aksi Cepat</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <button
-              onClick={() => router.push('/upload-cv')}
+              onClick={() => router.push("/upload-cv")}
               className="bg-card backdrop-blur-sm rounded-2xl p-6 border border-border hover:border-primary hover:shadow-md transition-all text-left group"
             >
               <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -238,7 +276,7 @@ export default function Dashboard() {
             </button>
 
             <button
-              onClick={() => router.push('/analysis')}
+              onClick={() => router.push("/analysis")}
               className="bg-card backdrop-blur-sm rounded-2xl p-6 border border-border hover:border-primary hover:shadow-md transition-all text-left group"
             >
               <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">

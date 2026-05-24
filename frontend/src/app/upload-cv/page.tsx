@@ -1,10 +1,17 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Upload, FileText, X, CheckCircle2, Loader2, ArrowLeft } from 'lucide-react';
-import { authService, cvService } from '../services/mockServices';
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Upload,
+  FileText,
+  X,
+  CheckCircle2,
+  Loader2,
+  ArrowLeft,
+} from "lucide-react";
+import { authService, cvService } from "../services/mockServices";
 
 export default function UploadCV() {
   const router = useRouter();
@@ -14,14 +21,28 @@ export default function UploadCV() {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadComplete, setUploadComplete] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    setUser(currentUser);
+    let cancelled = false;
+
+    const loadUser = async () => {
+      const currentUser = await authService.getCurrentUser();
+      if (cancelled) return;
+
+      if (!currentUser) {
+        router.push("/login");
+        return;
+      }
+
+      setUser(currentUser);
+    };
+
+    void loadUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -52,14 +73,24 @@ export default function UploadCV() {
     if (!file) return;
 
     setIsUploading(true);
-    await cvService.uploadCV(file);
-    setIsUploading(false);
-    setUploadComplete(true);
+    setLoadError("");
 
-    // Redirect ke halaman analisis setelah delay singkat
-    setTimeout(() => {
-      router.push('/analysis');
-    }, 1500);
+    try {
+      await cvService.uploadCV(file);
+      setUploadComplete(true);
+
+      setTimeout(() => {
+        router.push("/analysis");
+      }, 1500);
+    } catch (uploadError) {
+      setLoadError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Gagal mengupload CV.",
+      );
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const removeFile = () => {
@@ -76,18 +107,18 @@ export default function UploadCV() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push("/dashboard")}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-primary-foreground font-bold text-xl">P</span>
+                <span className="text-primary-foreground font-bold text-xl">
+                  P
+                </span>
               </div>
-              <span className="text-2xl font-bold text-secondary">
-                Porfio
-              </span>
+              <span className="text-2xl font-bold text-secondary">Porfio</span>
             </div>
           </div>
           <div className="text-right hidden sm:block">
@@ -97,8 +128,13 @@ export default function UploadCV() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-4xl font-bold mb-3 text-foreground">Upload CV Anda</h1>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-4xl font-bold mb-3 text-foreground">
+            Upload CV Anda
+          </h1>
           <p className="text-xl text-muted-foreground mb-12">
             Upload CV dalam format PDF, DOCX, atau gambar untuk memulai analisis
           </p>
@@ -109,7 +145,7 @@ export default function UploadCV() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            style={{ marginTop: '20px' }}
+            style={{ marginTop: "20px" }}
           >
             {/* Upload Area */}
             {!file ? (
@@ -117,11 +153,16 @@ export default function UploadCV() {
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                style={{ padding: '48px', borderRadius: '24px', borderStyle: 'dashed', marginTop: '20px' }}
+                style={{
+                  padding: "48px",
+                  borderRadius: "24px",
+                  borderStyle: "dashed",
+                  marginTop: "20px",
+                }}
                 className={`relative border-2 border-dashed rounded-3xl p-12 text-center transition-all ${
                   isDragging
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border bg-card shadow-sm'
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-card shadow-sm"
                 }`}
               >
                 <input
@@ -135,7 +176,9 @@ export default function UploadCV() {
                   <Upload className="w-10 h-10 text-secondary" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-foreground">
-                  {isDragging ? 'Lepaskan file di sini' : 'Drag & drop file CV Anda'}
+                  {isDragging
+                    ? "Lepaskan file di sini"
+                    : "Drag & drop file CV Anda"}
                 </h3>
                 <p className="text-muted-foreground mb-6">atau</p>
                 <label
@@ -156,7 +199,9 @@ export default function UploadCV() {
                     <FileText className="w-8 h-8 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <h4 className="font-bold mb-1 truncate text-foreground">{file.name}</h4>
+                    <h4 className="font-bold mb-1 truncate text-foreground">
+                      {file.name}
+                    </h4>
                     <p className="text-sm text-muted-foreground">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
@@ -174,14 +219,18 @@ export default function UploadCV() {
                 {isUploading && (
                   <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-foreground">Mengupload...</span>
-                      <span className="text-sm text-muted-foreground">Processing</span>
+                      <span className="text-sm font-medium text-foreground">
+                        Mengupload...
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        Processing
+                      </span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: '100%' }}
-                        transition={{ duration: 1.5, ease: 'easeInOut' }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 1.5, ease: "easeInOut" }}
                         className="h-full bg-primary"
                       />
                     </div>
@@ -222,52 +271,72 @@ export default function UploadCV() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            style={{ padding: '48px', borderRadius: '24px', marginTop: '20px' }}
+            style={{ padding: "48px", borderRadius: "24px", marginTop: "20px" }}
             className="bg-card rounded-3xl p-12 text-center border-2 border-primary/20 shadow-md"
           >
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="text-2xl font-bold mb-3 text-foreground">Upload Berhasil!</h3>
+            <h3 className="text-2xl font-bold mb-3 text-foreground">
+              Upload Berhasil!
+            </h3>
             <p className="text-muted-foreground mb-6">
-              CV Anda telah berhasil diupload. Mengarahkan ke halaman analisis...
+              CV Anda telah berhasil diupload. Mengarahkan ke halaman
+              analisis...
             </p>
             <div className="flex items-center justify-center gap-2">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              <span className="text-sm text-muted-foreground font-medium">Memproses AI...</span>
+              <span className="text-sm text-muted-foreground font-medium">
+                Memproses AI...
+              </span>
             </div>
           </motion.div>
         )}
+
+        {loadError ? (
+          <div className="mt-6 rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+            {loadError}
+          </div>
+        ) : null}
 
         {/* Info Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          style={{ marginTop: '25px' }}
+          style={{ marginTop: "25px" }}
           className="grid md:grid-cols-3 gap-6 mt-12"
         >
           {/* Kotak 1: Aman & Privat */}
           <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
-            <h4 className="font-bold mb-2 text-foreground text-left">Aman & Privat</h4>
+            <h4 className="font-bold mb-2 text-foreground text-left">
+              Aman & Privat
+            </h4>
             <p className="text-sm text-muted-foreground text-left">
-              Data CV Anda terenkripsi dan tidak akan dibagikan kepada pihak ketiga
+              Data CV Anda terenkripsi dan tidak akan dibagikan kepada pihak
+              ketiga
             </p>
           </div>
 
           {/* Kotak 2: Analisis Cepat */}
           <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
-            <h4 className="font-bold mb-2 text-foreground text-left">Analisis Cepat</h4>
+            <h4 className="font-bold mb-2 text-foreground text-left">
+              Analisis Cepat
+            </h4>
             <p className="text-sm text-muted-foreground text-left">
-              Dapatkan hasil analisis mendalam dalam hitungan detik menggunakan AI
+              Dapatkan hasil analisis mendalam dalam hitungan detik menggunakan
+              AI
             </p>
           </div>
 
           {/* Kotak 3: Rekomendasi Akurat */}
           <div className="bg-card rounded-2xl p-6 border border-border shadow-sm flex flex-col justify-center">
-            <h4 className="font-bold mb-2 text-foreground text-left">Rekomendasi Akurat</h4>
+            <h4 className="font-bold mb-2 text-foreground text-left">
+              Rekomendasi Akurat
+            </h4>
             <p className="text-sm text-muted-foreground text-left">
-              Temukan peluang karir yang paling sesuai dengan profil dan keahlian Anda
+              Temukan peluang karir yang paling sesuai dengan profil dan
+              keahlian Anda
             </p>
           </div>
         </motion.div>

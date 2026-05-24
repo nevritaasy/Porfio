@@ -1,47 +1,166 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Loader2,
-  TrendingUp,
   Briefcase,
-  MapPin,
-  DollarSign,
   CheckCircle2,
   Star,
   Award,
   Target,
   AlertCircle,
-} from 'lucide-react';
-import { authService, cvService } from '../services/mockServices';
+} from "lucide-react";
+import { authService, cvService } from "../services/mockServices";
+import type { NormalizedAnalysis } from "../services/mockServices";
 
 export default function Analysis() {
   const router = useRouter();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<NormalizedAnalysis | null>(null);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    const currentUser = authService.getCurrentUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    setUser(currentUser);
+    let cancelled = false;
 
-    // Jalankan simulasi analisis AI
-    cvService.analyzeCV().then((result: any) => {
-      setAnalysis(result);
-      setIsAnalyzing(false);
-    });
+    const loadAnalysis = async () => {
+      const currentUser = await authService.getCurrentUser();
+      if (cancelled) return;
+
+      if (!currentUser) {
+        router.push("/login");
+        return;
+      }
+
+      setUser(currentUser);
+
+      try {
+        const result = await cvService.analyzeCV();
+        if (cancelled) return;
+
+        setAnalysis(result);
+      } catch (analysisError) {
+        if (cancelled) return;
+        setLoadError(
+          analysisError instanceof Error
+            ? analysisError.message
+            : "CV belum dianalisis.",
+        );
+      } finally {
+        if (!cancelled) {
+          setIsAnalyzing(false);
+        }
+      }
+    };
+
+    void loadAnalysis();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   if (!user) return null;
+
+  if (isAnalyzing) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                  <span className="text-primary-foreground font-bold text-xl">
+                    P
+                  </span>
+                </div>
+                <span className="text-2xl font-bold text-secondary">
+                  Porfio
+                </span>
+              </div>
+            </div>
+            <div className="text-right hidden sm:block">
+              <p className="font-medium">{user.name}</p>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-6 py-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="max-w-2xl mx-auto text-center py-20"
+          >
+            <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            </div>
+            <h2 className="text-3xl font-bold mb-4">Menganalisis CV...</h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Menunggu hasil analisis terbaru dari backend.
+            </p>
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
+
+  if (loadError || !analysis) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
+                <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+              </button>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                  <span className="text-primary-foreground font-bold text-xl">
+                    P
+                  </span>
+                </div>
+                <span className="text-2xl font-bold text-secondary">
+                  Porfio
+                </span>
+              </div>
+            </div>
+            <div className="text-right hidden sm:block">
+              <p className="font-medium">{user.name}</p>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-3xl mx-auto px-6 py-20 text-center">
+          <div className="bg-card border border-border rounded-3xl p-10 shadow-sm">
+            <h1 className="text-3xl font-bold mb-4">Belum ada analisis CV</h1>
+            <p className="text-muted-foreground mb-8">
+              {loadError ||
+                "Upload CV terlebih dahulu untuk melihat hasil analisis."}
+            </p>
+            <button
+              onClick={() => router.push("/upload-cv")}
+              className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-all shadow-sm"
+            >
+              Upload CV Sekarang
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -50,18 +169,18 @@ export default function Analysis() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push("/dashboard")}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-primary-foreground font-bold text-xl">P</span>
+                <span className="text-primary-foreground font-bold text-xl">
+                  P
+                </span>
               </div>
-              <span className="text-2xl font-bold text-secondary">
-                Porfio
-              </span>
+              <span className="text-2xl font-bold text-secondary">Porfio</span>
             </div>
           </div>
           <div className="text-right hidden sm:block">
@@ -83,14 +202,15 @@ export default function Analysis() {
             </div>
             <h2 className="text-3xl font-bold mb-4">Menganalisis CV...</h2>
             <p className="text-xl text-muted-foreground mb-8">
-              AI kami sedang membedah keahlian Anda untuk mencari peluang karir terbaik.
+              AI kami sedang membedah keahlian Anda untuk mencari peluang karir
+              terbaik.
             </p>
             <div className="space-y-3 max-w-md mx-auto text-left">
               {[
-                'Membaca konten CV...',
-                'Mengidentifikasi keahlian teknis...',
-                'Menghitung scoring profesional...',
-                'Mencocokkan dengan database pekerjaan...',
+                "Membaca konten CV...",
+                "Mengidentifikasi keahlian teknis...",
+                "Menghitung scoring profesional...",
+                "Mencocokkan dengan database pekerjaan...",
               ].map((text, index) => (
                 <motion.div
                   key={index}
@@ -108,7 +228,10 @@ export default function Analysis() {
         ) : (
           /* RESULTS STATE */
           <div className="space-y-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
               <h1 className="text-4xl font-bold mb-3">Hasil Analisis CV</h1>
               <p className="text-xl text-muted-foreground">
                 Berikut adalah analisis lengkap dari CV Anda.
@@ -129,31 +252,47 @@ export default function Analysis() {
                     <span className="text-lg opacity-90">Skor Keseluruhan</span>
                   </div>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-7xl font-bold">{analysis.overallScore}</span>
+                    <span className="text-7xl font-bold">
+                      {analysis.overallScore}
+                    </span>
                     <span className="text-3xl opacity-70">/100</span>
                   </div>
                   <p className="mt-4 text-secondary-foreground/80 max-w-md">
-                    Profil CV Anda menunjukkan potensi yang kuat untuk berbagai peluang karir
+                    Profil CV Anda menunjukkan potensi yang kuat untuk berbagai
+                    peluang karir
                   </p>
                 </div>
                 <div className="hidden md:block">
                   <div className="w-40 h-40 relative">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                    <svg
+                      className="w-full h-full transform -rotate-90"
+                      viewBox="0 0 160 160"
+                    >
                       <circle
-                        cx="80" cy="80" r="70"
+                        cx="80"
+                        cy="80"
+                        r="70"
                         stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="12" fill="none"
+                        strokeWidth="12"
+                        fill="none"
                       />
                       <motion.circle
-                        cx="80" cy="80" r="70"
+                        cx="80"
+                        cy="80"
+                        r="70"
                         stroke="#DB924C"
-                        strokeWidth="12" fill="none"
+                        strokeWidth="12"
+                        fill="none"
                         strokeLinecap="round"
-                        initial={{ strokeDasharray: 439.6, strokeDashoffset: 439.6 }}
-                        animate={{
-                          strokeDashoffset: 439.6 - (439.6 * analysis.overallScore) / 100,
+                        initial={{
+                          strokeDasharray: 439.6,
+                          strokeDashoffset: 439.6,
                         }}
-                        transition={{ duration: 1.5, ease: 'easeOut' }}
+                        animate={{
+                          strokeDashoffset:
+                            439.6 - (439.6 * analysis.overallScore) / 100,
+                        }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
                       />
                     </svg>
                   </div>
@@ -174,11 +313,15 @@ export default function Analysis() {
                   <h2 className="text-2xl font-bold">Keahlian</h2>
                 </div>
                 <div className="space-y-6">
-                  {analysis.skills.map((skill: any, index: number) => (
+                  {analysis.skills.map((skill, index) => (
                     <div key={index}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-foreground">{skill.name}</span>
-                        <span className="text-sm font-bold text-primary">{skill.level}%</span>
+                        <span className="font-bold text-foreground">
+                          {skill.name}
+                        </span>
+                        <span className="text-sm font-bold text-primary">
+                          {skill.level}%
+                        </span>
                       </div>
                       <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                         <motion.div
@@ -199,7 +342,7 @@ export default function Analysis() {
                   <Target className="w-6 h-6 text-secondary" />
                   <h2 className="text-2xl font-bold">Rekomendasi Pekerjaan</h2>
                 </div>
-                {analysis.recommendations.map((job: any, index: number) => (
+                {analysis.recommendations.map((job, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
@@ -210,7 +353,9 @@ export default function Analysis() {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex-1 text-left">
                         <div className="flex items-center gap-3 mb-1">
-                          <h3 className="text-xl font-bold text-foreground leading-none">{job.role}</h3>
+                          <h3 className="text-xl font-bold text-foreground leading-none">
+                            {job.role}
+                          </h3>
                           <span className=" inline-flex bg-secondary/10 text-secondary text-xs font-bold px-2 py-1 rounded-md border border-secondary/20">
                             {job.matchScore}% MATCH
                           </span>
@@ -222,10 +367,15 @@ export default function Analysis() {
                     </div>
 
                     <div className="bg-muted/50 rounded-xl p-4 mb-4">
-                      <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">Analisis AI:</p>
+                      <p className="text-xs font-bold text-secondary uppercase tracking-wider mb-2">
+                        Analisis AI:
+                      </p>
                       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {job.reasons.map((reason: string, idx: number) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-foreground/80">
+                          <li
+                            key={idx}
+                            className="flex items-start gap-2 text-sm text-foreground/80"
+                          >
                             <CheckCircle2 className="size-4 text-primary mt-0.5" />
                             <span>{reason}</span>
                           </li>
@@ -251,7 +401,10 @@ export default function Analysis() {
                 </div>
                 <ul className="space-y-3">
                   {analysis.strengths.map((str: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full">
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full"
+                    >
                       <span className="size-1.5 bg-secondary rounded-full mt-2 shrink-0" />
                       <span className="flex-1">{str}</span>
                     </li>
@@ -271,7 +424,10 @@ export default function Analysis() {
                 </div>
                 <ul className="space-y-3">
                   {analysis.improvements.map((imp: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full">
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-sm text-foreground/80 text-left w-full"
+                    >
                       <span className="size-1.5 bg-accent rounded-full mt-2 shrink-0" />
                       <span className="flex-1">{imp}</span>
                     </li>
@@ -281,16 +437,19 @@ export default function Analysis() {
             </div>
 
             {/* Final Actions */}
-            <div style={{ marginTop: '30px', paddingBottom: '120px' }} className="w-full">
+            <div
+              style={{ marginTop: "30px", paddingBottom: "120px" }}
+              className="w-full"
+            >
               <div className="border-t border-foreground/10 pt-10 flex flex-col sm:flex-row gap-4 justify-center">
                 <button
-                  onClick={() => router.push('/upload-cv')}
+                  onClick={() => router.push("/upload-cv")}
                   className="px-8 py-3 bg-card border border-border text-foreground rounded-xl font-bold hover:bg-muted transition-all shadow-sm"
                 >
                   Ganti File CV
                 </button>
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => router.push("/dashboard")}
                   className="px-8 py-3 bg-secondary text-secondary-foreground rounded-xl font-bold hover:opacity-90 shadow-sm transition-all"
                 >
                   Selesai & Ke Dashboard

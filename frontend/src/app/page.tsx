@@ -1,18 +1,29 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { ArrowRight, FileCheck, BarChart3, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { authService } from './services/mockServices';
+import { motion } from "framer-motion";
+import { ArrowRight, FileCheck, BarChart3, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { authService } from "./services/mockServices";
 
 export default function Landing() {
   const router = useRouter();
 
   useEffect(() => {
-    if (authService.isAuthenticated()) {
-      router.push('/dashboard');
-    }
+    let cancelled = false;
+
+    const checkSession = async () => {
+      const currentUser = await authService.getCurrentUser();
+      if (!cancelled && currentUser) {
+        router.push("/dashboard");
+      }
+    };
+
+    void checkSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   return (
@@ -27,9 +38,7 @@ export default function Landing() {
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-xl">P</span>
           </div>
-          <span className="text-2xl font-bold text-secondary">
-            Porfio
-          </span>
+          <span className="text-2xl font-bold text-secondary">Porfio</span>
         </motion.div>
 
         <motion.div
@@ -38,13 +47,13 @@ export default function Landing() {
           className="flex gap-3"
         >
           <button
-            onClick={() => router.push('/login')}
+            onClick={() => router.push("/login")}
             className="px-6 py-2 rounded-lg hover:bg-muted transition-colors font-medium"
           >
             Masuk
           </button>
           <button
-            onClick={() => router.push('/register')}
+            onClick={() => router.push("/register")}
             className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity font-medium shadow-sm"
           >
             Daftar Gratis
@@ -62,7 +71,9 @@ export default function Landing() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-card rounded-full mb-6 border border-border shadow-sm">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-card-foreground">Powered by AI Analysis</span>
+              <span className="text-sm font-medium text-card-foreground">
+                Powered by AI Analysis
+              </span>
             </div>
           </motion.div>
 
@@ -72,11 +83,8 @@ export default function Landing() {
             transition={{ delay: 0.2 }}
             className="text-6xl font-bold mb-6 leading-tight text-foreground"
           >
-            Temukan Karir Impian dengan{' '}
-            <span className="text-primary">
-              Analisis CV
-            </span>{' '}
-            Cerdas
+            Temukan Karir Impian dengan{" "}
+            <span className="text-primary">Analisis CV</span> Cerdas
           </motion.h1>
 
           <motion.p
@@ -85,8 +93,8 @@ export default function Landing() {
             transition={{ delay: 0.3 }}
             className="text-xl text-foreground/80 mb-10 max-w-2xl mx-auto"
           >
-            Upload CV Anda dan dapatkan analisis mendalam, scoring profesional, dan rekomendasi
-            pekerjaan yang cocok dengan keahlian Anda
+            Upload CV Anda dan dapatkan analisis mendalam, scoring profesional,
+            dan rekomendasi pekerjaan yang cocok dengan keahlian Anda
           </motion.p>
 
           <motion.div
@@ -96,7 +104,7 @@ export default function Landing() {
             className="flex gap-4 justify-center"
           >
             <button
-              onClick={() => router.push('/register')}
+              onClick={() => router.push("/register")}
               className="px-8 py-4 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all flex items-center gap-2 group shadow-sm font-medium"
             >
               Mulai Sekarang
@@ -118,8 +126,8 @@ export default function Landing() {
             </div>
             <h3 className="text-xl font-bold mb-3">Upload CV Mudah</h3>
             <p className="text-foreground/70">
-              Upload CV dalam format PDF, DOCX, atau gambar. Sistem kami akan memproses dengan
-              cepat dan akurat.
+              Upload CV dalam format PDF, DOCX, atau gambar. Sistem kami akan
+              memproses dengan cepat dan akurat.
             </p>
           </div>
 
@@ -129,8 +137,8 @@ export default function Landing() {
             </div>
             <h3 className="text-xl font-bold mb-3">Analisis Mendalam</h3>
             <p className="text-foreground/70">
-              Dapatkan scoring profesional dari skills, pengalaman, dan potensi karir Anda dengan
-              AI terbaru.
+              Dapatkan scoring profesional dari skills, pengalaman, dan potensi
+              karir Anda dengan AI terbaru.
             </p>
           </div>
 

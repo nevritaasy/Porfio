@@ -1,121 +1,316 @@
-// Mock authentication service using localStorage
-export const authService = {
-  isAuthenticated: () => {
-    return localStorage.getItem('porfio_user') !== null;
-  },
-
-  login: (email: string, password: string) => {
-    // Mock login - in real app, this would call an API
-    const user = {
-      id: '1',
-      email,
-      name: email.split('@')[0],
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem('porfio_user', JSON.stringify(user));
-    return user;
-  },
-
-  register: (email: string, password: string, name: string) => {
-    // Mock register - in real app, this would call an API
-    const user = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      name,
-      createdAt: new Date().toISOString(),
-    };
-    localStorage.setItem('porfio_user', JSON.stringify(user));
-    return user;
-  },
-
-  logout: () => {
-    localStorage.removeItem('porfio_user');
-    localStorage.removeItem('porfio_cv_data');
-  },
-
-  getCurrentUser: () => {
-    const userStr = localStorage.getItem('porfio_user');
-    return userStr ? JSON.parse(userStr) : null;
-  },
+type BackendUser = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt?: string;
 };
 
-// CV analysis service 
-export const cvService = {
-  uploadCV: async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
+export type NormalizedAnalysis = {
+  overallScore: number;
+  skills: Array<{ name: string; level: number }>;
+  recommendations: Array<{
+    role: string;
+    matchScore: number;
+    reasons: string[];
+  }>;
+  strengths: string[];
+  improvements: string[];
+  uploadedAt?: string;
+};
 
+type JobRecommendationPayload = {
+  role?: string;
+  job_title?: string;
+  matchScore?: number | string;
+  match_score?: number | string;
+  reasons?: unknown[];
+  improvement_suggestions?: unknown[];
+  reason?: string;
+};
+
+type AnalysisRecord = {
+  scores?: {
+    overall_score?: number | string;
+    total_score?: number | string;
+    overallScore?: number | string;
+  };
+  cv_data?: {
+    skills?: {
+      technical_skills?: unknown[];
+      soft_skills?: unknown[];
+    };
+  };
+  ai_summary?: {
+    strengths?: unknown[];
+    areas_for_improvement?: unknown[];
+  };
+  job_recommendations?: unknown[];
+  createdAt?: string;
+};
+
+type AnalysisResponse = {
+  analysis?: {
+    content?: AnalysisRecord;
+    createdAt?: string;
+  };
+  content?: AnalysisRecord;
+  createdAt?: string;
+  cv_data?: AnalysisRecord["cv_data"];
+  ai_summary?: AnalysisRecord["ai_summary"];
+  job_recommendations?: unknown[];
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:8080"
+).replace(/\/$/, "");
+
+async function requestJson<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    credentials: "include",
+    ...options,
+  });
+
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    throw new Error(
+      payload?.error || `Request failed with status ${response.status}`,
+    );
+  }
+
+  return payload as T;
+}
+
+function toNumber(value: unknown, fallback: number): number {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function normalizeReasons(job: unknown): string[] {
+  const recommendation = isRecord(job) ? (job as JobRecommendationPayload) : {};
+
+  if (Array.isArray(recommendation.reasons)) {
+    return recommendation.reasons.filter(
+      (reason: unknown) => typeof reason === "string" && reason.trim(),
+    ) as string[];
+  }
+
+  if (Array.isArray(recommendation.improvement_suggestions)) {
+    return recommendation.improvement_suggestions.filter(
+      (reason: unknown) => typeof reason === "string" && reason.trim(),
+    ) as string[];
+  }
+
+  if (
+    typeof recommendation.reason === "string" &&
+    recommendation.reason.trim()
+  ) {
+    return [recommendation.reason.trim()];
+  }
+
+  return ["Keahlian Anda relevan untuk peran ini."];
+}
+
+function normalizeAnalysis(
+  payload: AnalysisResponse | AnalysisRecord | null | undefined,
+): NormalizedAnalysis {
+  const analysisPayload =
+    payload?.analysis?.content ??
+    payload?.analysis ??
+    payload?.content ??
+    payload ??
+    {};
+  const scores = analysisPayload?.scores ?? {};
+  const cvData = analysisPayload?.cv_data ?? payload?.cv_data ?? {};
+  const aiSummary = analysisPayload?.ai_summary ?? payload?.ai_summary ?? {};
+  const jobRecommendations =
+    analysisPayload?.job_recommendations ?? payload?.job_recommendations ?? [];
+
+  const overallScore = toNumber(
+    scores?.overall_score ?? scores?.total_score ?? scores?.overallScore,
+    80,
+  );
+
+  const baseSkills = [
+    ...((cvData?.skills?.technical_skills ?? []) as string[]),
+    ...((cvData?.skills?.soft_skills ?? []) as string[]),
+  ]
+    .filter((skill) => typeof skill === "string" && skill.trim())
+    .slice(0, 5);
+
+  const skills = baseSkills.map((name, index) => ({
+    name,
+    level: Math.max(
+      45,
+      Math.min(95, Math.round(overallScore) + 18 - index * 6),
+    ),
+  }));
+
+  return {
+    overallScore,
+    skills,
+    recommendations: (Array.isArray(jobRecommendations)
+      ? jobRecommendations
+      : []
+    )
+      .slice(0, 3)
+      .map((job) => {
+        const recommendation = isRecord(job)
+          ? (job as JobRecommendationPayload)
+          : {};
+
+        return {
+          role:
+            recommendation.role ||
+            recommendation.job_title ||
+            "Rekomendasi Pekerjaan",
+          matchScore: toNumber(
+            recommendation.matchScore ?? recommendation.match_score,
+            85,
+          ),
+          reasons: normalizeReasons(job),
+        };
+      }),
+    strengths: Array.isArray(aiSummary?.strengths)
+      ? aiSummary.strengths.filter((item: unknown) => typeof item === "string")
+      : [],
+    improvements: Array.isArray(aiSummary?.areas_for_improvement)
+      ? aiSummary.areas_for_improvement.filter(
+          (item: unknown) => typeof item === "string",
+        )
+      : [],
+    uploadedAt:
+      payload?.analysis?.createdAt ??
+      payload?.createdAt ??
+      analysisPayload?.createdAt ??
+      undefined,
+  };
+}
+
+export const authService = {
+  isAuthenticated: async () => {
+    return (await authService.getCurrentUser()) !== null;
+  },
+
+  login: async (email: string, password: string) => {
+    const payload = await requestJson<{ user: BackendUser }>(
+      "/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      },
+    );
+
+    return payload.user;
+  },
+
+  register: async (email: string, password: string, name: string) => {
+    const payload = await requestJson<{ user: BackendUser }>(
+      "/api/auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      },
+    );
+
+    return payload.user;
+  },
+
+  logout: async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/process-pdf', {
-        method: 'POST',
-        body: formData,
+      await requestJson<{ message: string }>("/api/auth/logout", {
+        method: "POST",
       });
-
-      if (!response.ok) {
-        throw new Error(`Upload gagal! Status: ${response.status}`);
-      }
-
-      const rawResult = await response.json();
-      console.log("DATA ASLI DARI NARO:", rawResult);
-
-      const aiResult = {
-        // Ambil skor (default 80)
-        overallScore: rawResult.scores?.overall_score || rawResult.scores?.total_score || 80,
-        
-        // Gabungin technical & soft skills, kasih persentase acak (75-95) biar bar chart UI-mu bisa jalan! -> gatau zuzur
-        skills: [
-          ...(rawResult.cv_data?.skills?.technical_skills || []).map((s: string) => ({ name: s, level: Math.floor(Math.random() * 20) + 75 })),
-          ...(rawResult.cv_data?.skills?.soft_skills || []).map((s: string) => ({ name: s, level: Math.floor(Math.random() * 20) + 75 }))
-        ].slice(0, 5), // Ambil 5 skill teratas aja biar desain nggak kepanjangan
-
-        // Sesuaikan rekomendasi pekerjaan
-        recommendations: (rawResult.job_recommendations || []).slice(0, 3).map((job: any) => ({
-          role: job.role || job.job_title || 'Rekomendasi Pekerjaan',
-          matchScore: job.matchScore || job.match_score || 85,
-          reasons: job.reasons || job.improvement_suggestions || ["Keahlian teknis Anda sangat cocok untuk peran ini."]
-        })),
-
-        // Ambil strengths & improvements dari dalam ai_summary
-        strengths: rawResult.ai_summary?.strengths || [],
-        improvements: rawResult.ai_summary?.areas_for_improvement || [],
-      };
-
-      // Simpan hasil terjemahan ke localStorage
-      localStorage.setItem('porfio_cv_data', JSON.stringify({
-        fileName: file.name,
-        uploadedAt: new Date().toISOString(),
-        size: file.size,
-        analysisData: aiResult 
-      }));
-
-      return aiResult;
-
-    } catch (error) {
-      console.error("Gagal nyambung ke backend:", error);
-      throw error;
+    } finally {
+      localStorage.removeItem("porfio_user");
+      localStorage.removeItem("porfio_cv_data");
     }
   },
 
-  analyzeCV: () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const cvStr = localStorage.getItem('porfio_cv_data');
-        if (cvStr) {
-          const parsedData = JSON.parse(cvStr);
-          if (parsedData.analysisData) {
-             resolve(parsedData.analysisData);
-          } else {
-             reject(new Error("Data analisis belum ada. Coba upload ulang."));
-          }
-        } else {
-          reject(new Error("CV tidak ditemukan."));
-        }
-      }, 3500); 
+  getCurrentUser: async (): Promise<BackendUser | null> => {
+    try {
+      const payload = await requestJson<{ user: BackendUser }>("/api/user/me");
+      return payload.user;
+    } catch {
+      return null;
+    }
+  },
+};
+
+export const cvService = {
+  uploadCV: async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const rawResult = await requestJson<AnalysisResponse>("/api/process-pdf", {
+      method: "POST",
+      body: formData,
     });
+
+    const normalized = normalizeAnalysis(rawResult);
+
+    localStorage.setItem(
+      "porfio_cv_data",
+      JSON.stringify({
+        fileName: file.name,
+        uploadedAt: normalized.uploadedAt || new Date().toISOString(),
+        size: file.size,
+        analysisData: normalized,
+      }),
+    );
+
+    return normalized;
   },
 
-  getStoredCV: () => {
-    const cvStr = localStorage.getItem('porfio_cv_data');
-    return cvStr ? JSON.parse(cvStr) : null;
+  analyzeCV: async () => {
+    const latestAnalysis = await cvService.getLatestAnalysis();
+
+    if (!latestAnalysis) {
+      throw new Error("CV tidak ditemukan.");
+    }
+
+    return latestAnalysis;
+  },
+
+  getLatestAnalysis: async (): Promise<NormalizedAnalysis | null> => {
+    try {
+      const payload = await requestJson<AnalysisResponse>(
+        "/api/user/own/latest",
+      );
+
+      return normalizeAnalysis(payload);
+    } catch {
+      return null;
+    }
+  },
+
+  getStoredCV: async () => {
+    const cvStr = localStorage.getItem("porfio_cv_data");
+    if (cvStr) {
+      return JSON.parse(cvStr);
+    }
+
+    const latestAnalysis = await cvService.getLatestAnalysis();
+    return latestAnalysis
+      ? {
+          uploadedAt: latestAnalysis.uploadedAt,
+          analysisData: latestAnalysis,
+        }
+      : null;
   },
 };

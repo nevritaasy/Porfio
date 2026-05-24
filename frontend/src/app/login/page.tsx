@@ -1,28 +1,34 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
-import { authService } from '../services/mockServices';
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Mail, Lock, ArrowRight } from "lucide-react";
+import { authService } from "../services/mockServices";
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      authService.login(email, password);
+    try {
+      await authService.login(email, password);
+      router.push("/dashboard");
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error ? submitError.message : "Gagal masuk.",
+      );
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 1000);
+    }
   };
 
   return (
@@ -36,10 +42,14 @@ export default function Login() {
         >
           <Link href="/" className="inline-flex items-center gap-2 mb-2">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-primary-foreground font-bold text-2xl">P</span>
+              <span className="text-primary-foreground font-bold text-2xl">
+                P
+              </span>
             </div>
           </Link>
-          <h1 className="text-3xl font-bold mt-4 text-foreground">Masuk ke Porfio</h1>
+          <h1 className="text-3xl font-bold mt-4 text-foreground">
+            Masuk ke Porfio
+          </h1>
           <p className="text-foreground/70 mt-2">Lanjutkan analisis CV Anda</p>
         </motion.div>
 
@@ -83,10 +93,16 @@ export default function Login() {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 rounded border-border text-primary focus:ring-ring/50 outline-none" />
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-ring/50 outline-none"
+                />
                 <span className="text-sm text-foreground/80">Ingat saya</span>
               </label>
-              <button type="button" className="text-sm text-primary hover:underline font-medium">
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline font-medium"
+              >
                 Lupa password?
               </button>
             </div>
@@ -97,7 +113,7 @@ export default function Login() {
               className="w-full py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50 font-medium shadow-sm"
             >
               {isLoading ? (
-                'Memproses...'
+                "Memproses..."
               ) : (
                 <>
                   Masuk
@@ -105,11 +121,15 @@ export default function Login() {
                 </>
               )}
             </button>
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </form>
 
           <div className="mt-6 text-center text-sm text-foreground/70">
-            Belum punya akun?{' '}
-            <Link href="/register" className="text-primary font-medium hover:underline">
+            Belum punya akun?{" "}
+            <Link
+              href="/register"
+              className="text-primary font-medium hover:underline"
+            >
               Daftar sekarang
             </Link>
           </div>

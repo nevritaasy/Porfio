@@ -1,29 +1,35 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
-import { authService } from '../services/mockServices';
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { authService } from "../services/mockServices";
 
 export default function Register() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      authService.register(email, password, name);
+    try {
+      await authService.register(email, password, name);
+      router.push("/dashboard");
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error ? submitError.message : "Gagal mendaftar.",
+      );
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 1000);
+    }
   };
 
   return (
@@ -37,11 +43,15 @@ export default function Register() {
         >
           <Link href="/" className="inline-flex items-center gap-2 mb-2">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-primary-foreground font-bold text-2xl">P</span>
+              <span className="text-primary-foreground font-bold text-2xl">
+                P
+              </span>
             </div>
           </Link>
           <h1 className="text-3xl font-bold mt-4">Daftar ke Porfio</h1>
-          <p className="text-foreground/70 mt-2">Mulai analisis CV Anda sekarang</p>
+          <p className="text-foreground/70 mt-2">
+            Mulai analisis CV Anda sekarang
+          </p>
         </motion.div>
 
         {/* Form */}
@@ -53,7 +63,9 @@ export default function Register() {
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Nama Lengkap</label>
+              <label className="block text-sm font-medium mb-2">
+                Nama Lengkap
+              </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
@@ -96,18 +108,30 @@ export default function Register() {
                   minLength={6}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Minimal 6 karakter</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Minimal 6 karakter
+              </p>
             </div>
 
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 mt-0.5 rounded border-border text-primary focus:ring-ring/50 outline-none" required />
+              <input
+                type="checkbox"
+                className="w-4 h-4 mt-0.5 rounded border-border text-primary focus:ring-ring/50 outline-none"
+                required
+              />
               <span className="text-sm text-foreground/80">
-                Saya setuju dengan{' '}
-                <button type="button" className="text-primary hover:underline font-medium">
+                Saya setuju dengan{" "}
+                <button
+                  type="button"
+                  className="text-primary hover:underline font-medium"
+                >
                   Syarat & Ketentuan
-                </button>{' '}
-                dan{' '}
-                <button type="button" className="text-primary hover:underline font-medium">
+                </button>{" "}
+                dan{" "}
+                <button
+                  type="button"
+                  className="text-primary hover:underline font-medium"
+                >
                   Kebijakan Privasi
                 </button>
               </span>
@@ -119,7 +143,7 @@ export default function Register() {
               className="w-full py-3 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50 font-medium shadow-sm"
             >
               {isLoading ? (
-                'Memproses...'
+                "Memproses..."
               ) : (
                 <>
                   Daftar Sekarang
@@ -127,11 +151,15 @@ export default function Register() {
                 </>
               )}
             </button>
+            {error ? <p className="text-sm text-destructive">{error}</p> : null}
           </form>
 
           <div className="mt-6 text-center text-sm text-foreground/70">
-            Sudah punya akun?{' '}
-            <Link href="/login" className="text-primary font-medium hover:underline">
+            Sudah punya akun?{" "}
+            <Link
+              href="/login"
+              className="text-primary font-medium hover:underline"
+            >
               Masuk di sini
             </Link>
           </div>
