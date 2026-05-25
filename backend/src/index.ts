@@ -16,6 +16,9 @@ const defaultAllowedOrigins = new Set([
   "http://localhost",
   "http://127.0.0.1",
   "http://frontend:3000",
+  "http://backend:8080",
+  "http://ollama:11434",
+  "http://nginx:80",
 ]);
 
 function getAllowedOrigins(): string[] {
