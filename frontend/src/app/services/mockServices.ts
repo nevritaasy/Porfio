@@ -81,7 +81,7 @@ function resolveApiBaseUrl(): string {
   ).trim();
 
   if (!configuredBase) {
-    return typeof window !== "undefined" ? "/api" : "http://localhost:8080";
+    return typeof window !== "undefined" ? "" : "http://localhost:8080";
   }
 
   if (typeof window !== "undefined") {
@@ -93,7 +93,7 @@ function resolveApiBaseUrl(): string {
         resolvedUrl.hostname === "ollama";
 
       if (isInternalDockerHost) {
-        return "/api";
+        return "";
       }
 
       return resolvedUrl.toString().replace(/\/$/, "");
