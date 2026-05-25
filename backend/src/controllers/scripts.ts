@@ -10,7 +10,7 @@ import prisma from "../lib/prisma.js";
 
 const SCRIPT_PATH = path.resolve(process.cwd(), "ai_services", "main.py");
 const MAX_BUFFER_BYTES = 10 * 1024 * 1024;
-const TIMEOUT_MS = 100_000;
+const TIMEOUT_MS = 999_999;
 
 type PythonCommand = {
   command: string;
