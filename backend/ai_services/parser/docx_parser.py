@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 try:
@@ -34,7 +35,7 @@ def extract_text_from_docx(docx_path: str | Path) -> dict:
                     paragraphs.append("  |  ".join(row_texts))
 
     except Exception as exc:
-        print(f"[docx_parser] Failed to parse DOCX: {exc}")
+        print(f"[docx_parser] Failed to parse DOCX: {exc}", file=sys.stderr)
         return {
             "text": "",
             "metadata": {

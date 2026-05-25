@@ -64,6 +64,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
+function isAnalysisResponse(
+  payload: AnalysisResponse | AnalysisRecord | null | undefined,
+): payload is AnalysisResponse {
+  return (
+    isRecord(payload) &&
+    ("analysis" in payload || "content" in payload || "createdAt" in payload)
+  );
+}
+
 const API_BASE_URL = (
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
@@ -123,17 +132,24 @@ function normalizeReasons(job: unknown): string[] {
 function normalizeAnalysis(
   payload: AnalysisResponse | AnalysisRecord | null | undefined,
 ): NormalizedAnalysis {
+  const responsePayload = isAnalysisResponse(payload) ? payload : undefined;
+  const recordPayload = isRecord(payload)
+    ? (payload as AnalysisRecord)
+    : undefined;
+
   const analysisPayload =
-    payload?.analysis?.content ??
-    payload?.analysis ??
-    payload?.content ??
-    payload ??
+    responsePayload?.analysis?.content ??
+    responsePayload?.content ??
+    recordPayload ??
     {};
   const scores = analysisPayload?.scores ?? {};
-  const cvData = analysisPayload?.cv_data ?? payload?.cv_data ?? {};
-  const aiSummary = analysisPayload?.ai_summary ?? payload?.ai_summary ?? {};
+  const cvData = analysisPayload?.cv_data ?? responsePayload?.cv_data ?? {};
+  const aiSummary =
+    analysisPayload?.ai_summary ?? responsePayload?.ai_summary ?? {};
   const jobRecommendations =
-    analysisPayload?.job_recommendations ?? payload?.job_recommendations ?? [];
+    analysisPayload?.job_recommendations ??
+    responsePayload?.job_recommendations ??
+    [];
 
   const overallScore = toNumber(
     scores?.overall_score ?? scores?.total_score ?? scores?.overallScore,
@@ -189,8 +205,8 @@ function normalizeAnalysis(
         )
       : [],
     uploadedAt:
-      payload?.analysis?.createdAt ??
-      payload?.createdAt ??
+      responsePayload?.analysis?.createdAt ??
+      responsePayload?.createdAt ??
       analysisPayload?.createdAt ??
       undefined,
   };

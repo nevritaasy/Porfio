@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 from typing import Optional
 
 try:
@@ -13,8 +14,8 @@ try:
 except ImportError:
     _REQUESTS_AVAILABLE = False
 
-_DEFAULT_HOST = "http://localhost:11434"
-_DEFAULT_MODEL = "qwen2.5:1.5b"
+_DEFAULT_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+_DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:1.5b")
 _GENERATE_ENDPOINT = "/api/generate"
 _TIMEOUT_SECONDS = 300
 
@@ -25,8 +26,8 @@ class OllamaClient:
         host: Optional[str] = None,
         model: Optional[str] = None,
     ) -> None:
-        self.host = (host or os.environ.get("OLLAMA_HOST") or _DEFAULT_HOST).rstrip("/")
-        self.model = model or os.environ.get("OLLAMA_MODEL") or _DEFAULT_MODEL
+        self.host = (host or _DEFAULT_HOST).rstrip("/")
+        self.model = model or _DEFAULT_MODEL
         self._available: Optional[bool] = None  
 
     def is_available(self) -> bool:
@@ -46,7 +47,8 @@ class OllamaClient:
         if not self._available:
             print(
                 f"[ollama_client] Ollama not available at {self.host}. "
-                "Falling back to rule-based explanations."
+                "Falling back to rule-based explanations.",
+                file=sys.stderr,
             )
 
         return self._available
@@ -69,7 +71,7 @@ class OllamaClient:
             data = resp.json()
             return data.get("response", "").strip() or None
         except Exception as exc:
-            print(f"[ollama_client] generate() failed: {exc}")
+            print(f"[ollama_client] generate() failed: {exc}", file=sys.stderr)
             return None
 
     @staticmethod

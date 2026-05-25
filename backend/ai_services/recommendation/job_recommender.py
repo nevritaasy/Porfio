@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -23,7 +24,7 @@ def _load_job_roles() -> list[dict]:
         with open(_ROLES_PATH, "r", encoding="utf-8") as f:
             _JOB_ROLES = json.load(f)
     except Exception as exc:
-        print(f"[job_recommender] Could not load job_roles.json: {exc}")
+        print(f"[job_recommender] Could not load job_roles.json: {exc}", file=sys.stderr)
         _JOB_ROLES = []
     return _JOB_ROLES
 

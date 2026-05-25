@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -26,7 +27,7 @@ def _load_skill_dict() -> dict[str, list[str]]:
         }
         return _SKILL_DICT
     except Exception as exc:
-        print(f"[skill_extractor] Could not load skill dictionary: {exc}")
+        print(f"[skill_extractor] Could not load skill dictionary: {exc}", file=sys.stderr)
         _SKILL_DICT = {
             "technical_skills": [],
             "soft_skills": [],

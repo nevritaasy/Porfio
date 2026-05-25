@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -39,7 +40,7 @@ def _render_page_to_pil(fitz_page: "fitz.Page") -> Optional["Image.Image"]:
         img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
         return img
     except Exception as exc:
-        print(f"[pdf_parser] Failed to render page to image: {exc}")
+        print(f"[pdf_parser] Failed to render page to image: {exc}", file=sys.stderr)
         return None
 
 
@@ -58,7 +59,7 @@ def _extract_page_with_fallback(
             if raw:
                 text = raw.strip()
         except Exception as exc:
-            print(f"[pdf_parser] pdfplumber extract_text failed on page {page_index + 1}: {exc}")
+            print(f"[pdf_parser] pdfplumber extract_text failed on page {page_index + 1}: {exc}", file=sys.stderr)
 
     # Fallback to OCR if native text is insufficient
     if _page_quality(text) == "poor" or force_ocr:
@@ -72,7 +73,7 @@ def _extract_page_with_fallback(
                         text = ocr_text
                         method = "ocr"
             except Exception as exc:
-                print(f"[pdf_parser] OCR fallback failed on page {page_index + 1}: {exc}")
+                print(f"[pdf_parser] OCR fallback failed on page {page_index + 1}: {exc}", file=sys.stderr)
                 method = "error"
         elif not _FITZ_AVAILABLE and _page_quality(text) == "poor":
             method = "native_poor"
@@ -129,7 +130,7 @@ def extract_text_from_pdf(
         try:
             fitz_doc = fitz.open(str(pdf_path))
         except Exception as exc:
-            print(f"[pdf_parser] Could not open PDF with PyMuPDF: {exc}")
+            print(f"[pdf_parser] Could not open PDF with PyMuPDF: {exc}", file=sys.stderr)
 
     try:
         with pdfplumber.open(str(pdf_path)) as pdf:
@@ -139,7 +140,7 @@ def extract_text_from_pdf(
                         page, idx, fitz_doc, force_ocr
                     )
                 except Exception as exc:
-                    print(f"[pdf_parser] Page {idx + 1} failed completely: {exc}")
+                    print(f"[pdf_parser] Page {idx + 1} failed completely: {exc}", file=sys.stderr)
                     text, method = "", "error"
 
                 pages_data.append({

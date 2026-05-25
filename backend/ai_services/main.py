@@ -585,7 +585,7 @@ def main():
         if output_path:
             with open(output_path, "w", encoding="utf-8") as f:
                 f.write(json_output)
-            print(f"Result successfully saved to {output_path}")
+            print(f"Result successfully saved to {output_path}", file=sys.stderr)
         else:
             print(json_output)
             

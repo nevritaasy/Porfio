@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import platform
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -64,7 +65,7 @@ def ocr_image_file(image_path: str | Path, lang: str = "eng+ind") -> tuple[str, 
         text = pytesseract.image_to_string(img, lang=lang)
         return text.strip(), "ocr"
     except Exception as exc:
-        print(f"[image_ocr] OCR failed for {image_path}: {exc}")
+        print(f"[image_ocr] OCR failed for {image_path}: {exc}", file=sys.stderr)
         return "", "error"
 
 
@@ -75,7 +76,7 @@ def ocr_pil_image(image: "Image.Image", lang: str = "eng+ind") -> str:
     try:
         return pytesseract.image_to_string(image, lang=lang).strip()
     except Exception as exc:
-        print(f"[image_ocr] OCR on PIL image failed: {exc}")
+        print(f"[image_ocr] OCR on PIL image failed: {exc}", file=sys.stderr)
         return ""
 
 
