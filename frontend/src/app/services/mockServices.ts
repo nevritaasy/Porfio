@@ -73,11 +73,39 @@ function isAnalysisResponse(
   );
 }
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080"
-).replace(/\/$/, "");
+function resolveApiBaseUrl(): string {
+  const configuredBase = (
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    ""
+  ).trim();
+
+  if (!configuredBase) {
+    return typeof window !== "undefined" ? "/api" : "http://localhost:8080";
+  }
+
+  if (typeof window !== "undefined") {
+    try {
+      const resolvedUrl = new URL(configuredBase, window.location.origin);
+      const isInternalDockerHost =
+        resolvedUrl.hostname === "backend" ||
+        resolvedUrl.hostname === "frontend" ||
+        resolvedUrl.hostname === "ollama";
+
+      if (isInternalDockerHost) {
+        return "/api";
+      }
+
+      return resolvedUrl.toString().replace(/\/$/, "");
+    } catch {
+      return configuredBase.replace(/\/$/, "");
+    }
+  }
+
+  return configuredBase.replace(/\/$/, "");
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 async function requestJson<T>(
   path: string,
